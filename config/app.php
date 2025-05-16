@@ -23,4 +23,12 @@ return [
     'runtime_path' => base_path(false) . DIRECTORY_SEPARATOR . 'runtime',
     'controller_suffix' => 'Controller',
     'controller_reuse' => false,
+    'pay' => [
+        'notifyUrl' => 'https://mc.allprocessin.xin',
+        'returnUrl' => 'https://mc.allprocessin.xin',
+    ],
+    'redis' => [
+        'host' => 'r-bp1yfpccoje2ss2btdpd.redis.rds.aliyuncs.com',
+        'password' => 'Jyq2w7!!bH$4',
+    ]
 ];

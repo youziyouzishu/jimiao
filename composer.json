@@ -36,7 +36,14 @@
     "tinywan/validate": "^1.0",
     "tinywan/jwt": "^1.11",
     "webman/redis-queue": "^2.1",
-    "yansongda/pay": "^3.7"
+    "yansongda/pay": "^3.7",
+    "webman/cache": "^2.1",
+    "webman/redis": "^2.1",
+    "illuminate/events": "^11.44",
+    "ramsey/uuid": "^4.7",
+    "phpoffice/phpspreadsheet": "^4.1",
+    "workerman/crontab": "^1.0",
+    "w7corp/easywechat": "^6.17"
   },
   "suggest": {
     "ext-event": "For better performance. "

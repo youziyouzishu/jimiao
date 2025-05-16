@@ -1,9 +1,9 @@
 <?php
 return [
     'default' => [
-        'host' => 'redis://127.0.0.1:6379',
+        'host' => 'redis://'.config('app.redis.host').':6379',
         'options' => [
-            'auth' => null,
+            'auth' => config('app.redis.password'),
             'db' => 0,
             'prefix' => '',
             'max_attempts'  => 5,

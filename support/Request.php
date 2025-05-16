@@ -17,8 +17,31 @@ namespace support;
 /**
  * Class Request
  * @package support
+ * @property int $user_id 用户ID
  */
 class Request extends \Webman\Http\Request
 {
+    /**
+     * 设置$request数据，自动覆盖更新
+     * @param string $method
+     * @param array $data
+     *
+     */
+    function setParams(string $method, array $data)
+    {
+        $method = strtolower($method);
+        if (!isset($this->data[$method])) {
+            if ($method == 'post'){
+                $this->parsePost();
+            }
+            if ($method == 'get'){
+                $this->parseGet();
+            }
+        }
+        $rawData = $this->data ?: [];// 获取原数据
+        $newData = $rawData; // 复制原始数据
+        $newData[$method] = array_merge($newData[$method] ?? [], $data); // 合并特定方法的数据
+        $this->data = $newData; // 更新对象数据
+    }
 
 }

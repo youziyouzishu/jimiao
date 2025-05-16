@@ -23,9 +23,9 @@ return [
             'jwt_token_expired' => 401, // 访问令牌过期
             'jwt_refresh_token_expired' => 402, // 刷新令牌过期
             'server_error' => 500, // 服务器内部错误
-            'server_error_is_response' => false, // 是否响应服务器内部错误
+            'server_error_is_response' => config('app.debug'), // 是否响应服务器内部错误
             'type_error' => 400, // 参数类型错误码
-            'type_error_is_response' => false, // 参数类型与预期声明的参数类型不匹配
+            'type_error_is_response' => config('app.debug'), // 参数类型与预期声明的参数类型不匹配
         ],
         // 自定义响应消息
         'body' => [
@@ -35,12 +35,12 @@ return [
         ],
         // 事件，event 与 webman/event 存在冲突，event 重命名为 event_trigger
         'event_trigger' => [
-            'enable' => false,
+            'enable' => true,
             // 钉钉机器人
             'dingtalk' => [
-                'accessToken' => 'xxxxxxxxxxxxxxxx',
-                'secret' => 'xxxxxxxxxxxxxxxx',
-                'title' => '钉钉机器人异常通知',
+                'accessToken' => 'dc7f1d377b24e052c7c5b870dbafa4c3e61f2e8b8c800d216c03311f2203e7fb',
+                'secret' => 'SEC72301ad86358439f47e1995c389411b1597448d7308dc292715555ec9b7b5664',
+                'title' => '极秒生活',
             ]
         ],
         /** 异常报警域名标题 */

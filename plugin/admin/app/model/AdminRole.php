@@ -5,9 +5,15 @@ namespace plugin\admin\app\model;
 use plugin\admin\app\model\Base;
 
 /**
- * @property integer $id ID(主键)
- * @property string $admin_id 管理员id
- * @property string $role_id 角色id
+ * 
+ *
+ * @property int $id 主键
+ * @property int $role_id 角色id
+ * @property int $admin_id 管理员id
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminRole newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminRole newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminRole query()
+ * @mixin \Eloquent
  */
 class AdminRole extends Base
 {
@@ -27,5 +33,10 @@ class AdminRole extends Base
     
     
     public $timestamps = false;
+
+    protected $fillable = [
+        'role_id',
+        'admin_id',
+    ];
     
 }

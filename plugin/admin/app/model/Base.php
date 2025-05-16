@@ -6,6 +6,14 @@ use DateTimeInterface;
 use support\Model;
 
 
+/**
+ * 
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Base newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Base newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Base query()
+ * @mixin \Eloquent
+ */
 class Base extends Model
 {
     /**
