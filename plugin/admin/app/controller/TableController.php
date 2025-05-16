@@ -395,6 +395,7 @@ class TableController extends Base
      */
     public function crud(Request $request): Response
     {
+        dump(2222);
         $table_name = $request->input('table');
         Util::checkTableName($table_name);
         $prefix = 'wa_';
@@ -409,6 +410,7 @@ class TableController extends Base
                 'controller' => "$base_path/controller/{$model_class}Controller.php",
             ]);
         }
+        dump(33333);
         $title = $request->post('title');
         $pid = $request->post('pid', 0);
         $icon = $request->post('icon', '');
@@ -418,7 +420,7 @@ class TableController extends Base
         if ($controller_file === '/' || $model_file === '/') {
             return $this->json(1, '控制器和model不能为空');
         }
-
+        dump(4444);
         $controller_info = pathinfo($controller_file);
         $model_info = pathinfo($model_file);
         $controller_path = Util::filterPath($controller_info['dirname'] ?? '');
@@ -430,7 +432,7 @@ class TableController extends Base
         if ($controller_info['extension'] !== 'php' || $model_info['extension'] !== 'php') {
             return $this->json(1, '控制器和model必须以.php为后缀');
         }
-
+        dump(5555);
         $pid = (int)$pid;
         if ($pid) {
             $parent_menu = Rule::find($pid);
@@ -447,7 +449,7 @@ class TableController extends Base
                 return $this->json(1, "$model_file 已经存在");
             }
         }
-
+        dump(6666);
         $explode = explode('/', trim($controller_path, '/'));
         $plugin = '';
         if (strpos(strtolower($controller_file), '/controller/') === false) {
@@ -471,12 +473,12 @@ class TableController extends Base
             }
             $app = strtolower($explode[1]) !== 'controller' ? $explode[1] : '';
         }
-
+        dump(7777);
         Util::pauseFileMonitor();
         try {
             $model_class = $model_file_name;
             $model_namespace = str_replace('/', '\\', trim($model_path, '/'));
-
+            dump(111);
             // 创建model
             $this->createModel($model_class, $model_namespace, base_path($model_file), $table_name);
 
@@ -486,7 +488,7 @@ class TableController extends Base
             // 创建controller
             $controller_url_name = $controller_suffix && substr($controller_class, -strlen($controller_suffix)) === $controller_suffix ? substr($controller_class, 0, -strlen($controller_suffix)) : $controller_class;
             $controller_url_name = str_replace('_', '-', $inflector->tableize($controller_url_name));
-
+            dump(222);
             if ($plugin) {
                 array_splice($explode, 0, 2);
             }
@@ -499,7 +501,7 @@ class TableController extends Base
                     unset($explode[$index]);
                 }
             }
-
+            dump(3333);
             $controller_base = implode('/', $explode);
             $controller_class_with_namespace = "$controller_namespace\\$controller_class";
             $template_path = $controller_base ? "$controller_base/$controller_url_name" : $controller_url_name;
@@ -507,7 +509,7 @@ class TableController extends Base
 
             // 创建模版
             $template_file_path = ($plugin ? "/plugin/$plugin" : '') . '/app/' . ($app ? "$app/" : '') . 'view/' . $template_path;
-
+            dump(444);
             $model_class_with_namespace = "$model_namespace\\$model_class";
             $primary_key = (new $model_class_with_namespace)->getKeyName();
             $url_path_base = ($plugin ? "/app/$plugin/" : '/') . ($app ? "$app/" : '') . $template_path;
@@ -515,7 +517,7 @@ class TableController extends Base
         } finally {
             Util::resumeFileMonitor();
         }
-
+        dump(8888);
         $menu = Rule::where('key', $controller_class_with_namespace)->first();
         if (!$menu) {
             $menu = new Rule;
@@ -536,7 +538,7 @@ class TableController extends Base
             }
             $rule_ids = array_merge($rule_ids, explode(',', $rule_string));
         }
-
+        dump(111111);
         // 不是超级管理员，则需要给当前管理员这个菜单的权限
         if (!in_array('*', $rule_ids) && $roles) {
             $role = Role::find(current($roles));

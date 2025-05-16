@@ -43,7 +43,8 @@
     "ramsey/uuid": "^4.7",
     "phpoffice/phpspreadsheet": "^4.1",
     "workerman/crontab": "^1.0",
-    "w7corp/easywechat": "^6.17"
+    "w7corp/easywechat": "^6.17",
+    "overtrue/easy-sms": "^3.1"
   },
   "suggest": {
     "ext-event": "For better performance. "

@@ -86,6 +86,12 @@ class Sms extends Base
     {
         $code = is_null($code) ? mt_rand(1000, 9999) : $code;
         $ip = request()->getRealIp();
+
+//        $tagName = 'sendCaptcha';
+//        \plugin\sms\api\Sms::sendByTag('13781176253', $tagName, [
+//            'code' => '1234'
+//        ]);
+
         $client = new Client();
         // 定义请求的 URL 和数据
         $url = 'http://sms.lifala.com.cn/api/KehuSms/send';

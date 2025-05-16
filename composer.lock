@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "020225b2324db7c63ccb4e2c68ec3eb8",
+    "content-hash": "2f8ef32db8afbfdd2fe2ef74c96c3a44",
     "packages": [
         {
             "name": "barryvdh/laravel-ide-helper",
@@ -2610,6 +2610,48 @@
                 "source": "https://github.com/Nyholm/psr7-server/tree/1.1.0"
             },
             "time": "2023-11-08T09:30:43+00:00"
+        },
+        {
+            "name": "overtrue/easy-sms",
+            "version": "3.1.0",
+            "dist": {
+                "type": "zip",
+                "url": "https://mirrors.cloud.tencent.com/repository/composer/overtrue/easy-sms/3.1.0/overtrue-easy-sms-3.1.0.zip",
+                "reference": "c3c5b3bc942beac18aa7cc1e435cefa5ecbe5975",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^6.2 || ^7.0",
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.54",
+                "jetbrains/phpstorm-attributes": "^1.0",
+                "mockery/mockery": "^1.4.2",
+                "phpunit/phpunit": "^9.5.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Overtrue\\EasySms\\": "src"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "overtrue",
+                    "email": "i@overtrue.me"
+                }
+            ],
+            "description": "The easiest way to send short message.",
+            "support": {
+                "issues": "https://github.com/overtrue/easy-sms/issues",
+                "source": "https://github.com/overtrue/easy-sms/tree/3.1.0"
+            },
+            "time": "2025-03-10T09:33:39+00:00"
         },
         {
             "name": "overtrue/socialite",

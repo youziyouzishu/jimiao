@@ -12,20 +12,12 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-use support\Response;
-use Webman\Route;
-
-Route::fallback(function () {
-    if (request()->header('accept') == 'application/json'){
-        throw new \Tinywan\ExceptionHandler\Exception\RouteNotFoundException();
-    }else{
-        return new Response(404, [], file_get_contents(base_path('plugin' . DIRECTORY_SEPARATOR. 'admin' . DIRECTORY_SEPARATOR . 'public') . '/demos/error/404.html'));
-    }
-});
-
-
-
-
-
-
-
+/**
+ * Static file settings
+ */
+return [
+    'enable' => true,
+    'middleware' => [     // Static file Middleware
+        //app\middleware\StaticFile::class,
+    ],
+];

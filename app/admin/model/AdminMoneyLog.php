@@ -7,7 +7,7 @@ use plugin\admin\app\model\Base;
 
 
 /**
- * 
+ *
  *
  * @property int $id 主键
  * @property int $admin_id 商户
@@ -71,7 +71,7 @@ class AdminMoneyLog extends Base
             2 => '充值',
         ];
     }
-    
-    
-    
+
+
+
 }

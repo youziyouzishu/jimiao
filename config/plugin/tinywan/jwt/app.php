@@ -31,7 +31,7 @@ return [
         'leeway' => 60,
 
         /** 是否允许单设备登录，默认不允许 false */
-        'is_single_device' => false,
+        'is_single_device' => true,
 
         /** 缓存令牌时间，单位：秒。默认 7 天 */
         'cache_token_ttl' => 604800,

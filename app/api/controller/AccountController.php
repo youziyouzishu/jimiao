@@ -56,4 +56,10 @@ class AccountController extends Base
         return $this->success('登陆成功', ['user' => $user, 'token' => $token]);
     }
 
+    function refreshToken()
+    {
+        $res = JwtToken::refreshToken();
+        return $this->success('成功', $res);
+    }
+
 }
