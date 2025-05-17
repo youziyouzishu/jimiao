@@ -44,7 +44,9 @@
     "phpoffice/phpspreadsheet": "^4.1",
     "workerman/crontab": "^1.0",
     "w7corp/easywechat": "^6.17",
-    "overtrue/easy-sms": "^3.1"
+    "overtrue/easy-sms": "^3.1",
+    "aliyuncs/oss-sdk-php": "^2.7",
+    "webman/rate-limiter": "^1.1"
   },
   "suggest": {
     "ext-event": "For better performance. "

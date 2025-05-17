@@ -4,6 +4,7 @@ namespace app\admin\controller;
 
 use app\api\service\Pay;
 use GuzzleHttp\Client;
+use plugin\admin\app\model\Admin;
 use support\Request;
 use support\Response;
 use app\admin\model\AdminRecharge;
@@ -54,7 +55,7 @@ class AdminRechargeController extends Crud
     public function select(Request $request): Response
     {
         [$where, $format, $limit, $field, $order] = $this->selectInput($request);
-        $query = $this->doSelect($where, $field, $order);
+        $query = $this->doSelect($where, $field, $order)->with(['admin']);
         if (in_array(3, admin('roles'))) {
             $query->where('admin_id', admin_id());
         }
@@ -77,33 +78,42 @@ class AdminRechargeController extends Crud
             $mobile = $request->post('mobile');
             $ordersn = Pay::generateOrderSn();
             $client = new Client();
-            $url = 'http://8.130.185.57:8080/api/payment-request';
+            $url = 'http://8.130.185.57:3000/api/payment-request';
+            $clientId = 'test_client';
+            $timestamp = time();
+            $secretKey = 'test_secret_key_123';
+            $requestParams = [
+                'clientId' => $clientId,
+                'amount' => $amount,
+                'title' => '商户充值',
+                'description' => '商户充值',
+                'bankVerification' => [
+                    'accountNo' => $bankcard_no,
+                    'name' => $truename,
+                    'idCardCode' => $idcard_no,
+                    'bankPreMobile' => $mobile
+                ],
+                'timestamp' => $timestamp
+            ];
+
+            $signature = Pay::generateSignature(
+                $clientId,
+                $timestamp,
+                $requestParams,
+                $secretKey
+            );
+            $requestData = array_merge($requestParams, ['signature' => $signature]);
             $result = $client->post($url, [
-                'json' => [
-                    'clientId' => 'test_client',
-                    'amount' => $amount,
-                    'title' => '商户充值',
-                    'description' => '商户充值',
-                    'notifyUrl' => config('app.pay.notifyUrl'),
-                    'returnUrl' => config('app.pay.returnUrl'),
-                    'extraData' => json_encode(['ordersn'=>$ordersn]),
-                    'bankVerification' => [
-                        'accountNo' => $bankcard_no,
-                        'name' => $truename,
-                        'idCardCode' => $idcard_no,
-                        'bankPreMobile' => $mobile
-                    ]
-                ]
+                'json' => $requestData,
             ]);
             $result = $result->getBody()->getContents();
             $result = json_decode($result);
             if ($result->success == false){
                 return $this->fail($result->message);
             }
-
             $admin_id = admin_id();
             $request->setParams('post',[
-                'order_sn' => $ordersn,
+                'ordersn' => $ordersn,
                 'admin_id' => $admin_id,
             ]);
             $data = $this->insertInput($request);
@@ -122,6 +132,14 @@ class AdminRechargeController extends Crud
     public function update(Request $request): Response
     {
         if ($request->method() === 'POST') {
+            $status = $request->post('status');
+            $id = $request->post('id');
+            $row = $this->model->find($id);
+            if ($row->status ==0 && $status == 1){
+                //审核通过  增加余额
+                Admin::changeMoney($row->amount,$row->admin_id,'充值',2);
+            }
+
             return parent::update($request);
         }
         return view('admin-recharge/update');

@@ -63,4 +63,31 @@ class Pay
     {
         return date('Ymd') . mb_strtoupper(uniqid());
     }
+
+    public static function generateSignature($clientId, $timestamp, $params, $secretKey)
+    {
+        // 1. 移除不需要签名的字段
+        $signParams = $params;
+        unset($signParams['signature']);
+
+        // 2. 按参数名排序
+        ksort($signParams);
+
+        // 3. 拼接参数
+        $signString = '';
+        foreach ($signParams as $key => $value) {
+            // 如果是数组或对象，转为JSON字符串
+            if (is_array($value) || is_object($value)) {
+                $value = json_encode($value,JSON_UNESCAPED_UNICODE);
+            }
+            $signString .= $key . '=' . $value . '&';
+        }
+
+        // 4. 拼接clientId, timestamp和密钥
+        $stringToSign = $clientId . '&' . $timestamp . '&' . $signString . $secretKey;
+        dump('构建签名字符串');
+        dump($stringToSign);
+        // 5. 使用SHA256计算签名
+        return hash('sha256', $stringToSign);
+    }
 }

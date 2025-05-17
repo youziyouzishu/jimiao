@@ -21,6 +21,7 @@ use plugin\admin\app\model\Base;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWithdraw newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWithdraw newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWithdraw query()
+ * @property string $ordersn 订单号
  * @mixin \Eloquent
  */
 class UserWithdraw extends Base
@@ -46,6 +47,7 @@ class UserWithdraw extends Base
         'reason',
         'ali_account',
         'ali_name',
+        'ordersn'
     ];
 
     protected $appends = ['status_text'];

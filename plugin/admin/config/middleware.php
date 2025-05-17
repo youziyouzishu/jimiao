@@ -17,5 +17,6 @@ use plugin\admin\app\middleware\AccessControl;
 return [
     '' => [
         AccessControl::class,
+        \plugin\storage\app\middleware\StorageMiddleware::class
     ]
 ];

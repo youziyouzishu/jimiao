@@ -7,11 +7,14 @@ use app\admin\model\User;
 use app\admin\model\UserMoneyLog;
 use app\admin\model\UserWithdraw;
 use app\api\basic\Base;
+use app\api\service\Pay;
 use Carbon\Carbon;
 use plugin\admin\app\model\Admin;
 use support\Db;
 use support\Request;
 use support\Response;
+use Webman\RateLimiter\Limiter;
+use Webman\RateLimiter\RateLimitException;
 
 class UserController extends Base
 {
@@ -95,6 +98,13 @@ class UserController extends Base
      */
     function withdraw(Request $request)
     {
+        try {
+            #限流器 每个用户1秒内只能请求1次
+            Limiter::check('user_' . $request->user_id, 1, 5);
+        } catch (RateLimitException $e) {
+            return $this->fail('请求频繁');
+        }
+
         $ali_name = $request->post('ali_name');
         $ali_account = $request->post('ali_account');
         $amount = $request->post('amount');
@@ -109,6 +119,7 @@ class UserController extends Base
         try {
             User::changeMoney(-$amount, $request->user_id, '提现', 2);
             UserWithdraw::create([
+                'ordersn' => Pay::generateOrderSn(),
                 'user_id' => $request->user_id,
                 'amount' => $amount,
                 'ali_name' => $ali_name,

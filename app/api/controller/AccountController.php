@@ -37,7 +37,7 @@ class AccountController extends Base
         if (!$user){
             $user = User::create([
                 'nickname' => !empty($nickname) ? $nickname : '用户' . mt_rand(1000, 9999),
-                'avatar' => !empty($avatar) ? $avatar : '/app/admin/avatar.png',
+                'avatar' => !empty($avatar) ? $avatar : 'https://mc.allprocessin.xin/app/admin/avatar.png',
                 'join_time' => Carbon::now()->toDateTimeString(),
                 'join_ip' => $request->getRealIp(),
                 'last_time' => Carbon::now()->toDateTimeString(),
@@ -45,6 +45,9 @@ class AccountController extends Base
                 'openid' => $openid,
             ]);
         }else{
+            if ($user->status == 1){
+                return $this->fail('账号已被封禁');
+            }
             $user->last_time = Carbon::now()->toDateTimeString();
             $user->last_ip = $request->getRealIp();
             $user->save();

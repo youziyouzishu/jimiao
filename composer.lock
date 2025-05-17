@@ -4,8 +4,47 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2f8ef32db8afbfdd2fe2ef74c96c3a44",
+    "content-hash": "3ae10022b1baf04aff50f8bc908a3587",
     "packages": [
+        {
+            "name": "aliyuncs/oss-sdk-php",
+            "version": "v2.7.2",
+            "dist": {
+                "type": "zip",
+                "url": "https://mirrors.cloud.tencent.com/repository/composer/aliyuncs/oss-sdk-php/v2.7.2/aliyuncs-oss-sdk-php-v2.7.2.zip",
+                "reference": "483dd0b8bff5d47f0e4ffc99f6077a295c5ccbb5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "php-coveralls/php-coveralls": "*",
+                "phpunit/phpunit": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "OSS\\": "src/OSS"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aliyuncs",
+                    "homepage": "http://www.aliyun.com"
+                }
+            ],
+            "description": "Aliyun OSS SDK for PHP",
+            "homepage": "http://www.aliyun.com/product/oss/",
+            "support": {
+                "issues": "https://github.com/aliyun/aliyun-oss-php-sdk/issues",
+                "source": "https://github.com/aliyun/aliyun-oss-php-sdk/tree/v2.7.2"
+            },
+            "time": "2024-10-28T10:41:12+00:00"
+        },
         {
             "name": "barryvdh/laravel-ide-helper",
             "version": "v3.3.0",
@@ -5935,6 +5974,35 @@
                 "source": "https://github.com/webman-php/log/tree/v2.1.3"
             },
             "time": "2025-02-26T11:43:36+00:00"
+        },
+        {
+            "name": "webman/rate-limiter",
+            "version": "v1.1.3",
+            "dist": {
+                "type": "zip",
+                "url": "https://mirrors.tencent.com/repository/composer/webman/rate-limiter/v1.1.3/webman-rate-limiter-v1.1.3.zip",
+                "reference": "f6ff79366ab56ac66bc507515d747cdef752db2d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0",
+                "workerman/webman-framework": ">=1.5.15"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webman\\RateLimiter\\": "src"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Webman plugin webman/rate-limiter",
+            "support": {
+                "issues": "https://github.com/webman-php/rate-limiter/issues",
+                "source": "https://github.com/webman-php/rate-limiter/tree/v1.1.3"
+            },
+            "time": "2024-12-27T10:02:44+00:00"
         },
         {
             "name": "webman/redis",

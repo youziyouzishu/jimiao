@@ -118,6 +118,9 @@
 					},{
 						title: "商户",align: "center",
 						field: "admin_id",
+                        templet: function (d) {
+                            return d.admin?d.admin.nickname:"";
+                        }
 					},{
 						title: "订单编号",align: "center",
 						field: "ordersn",
@@ -186,7 +189,7 @@
 				
 				// 获取表格中下拉或树形组件数据
 				let apiResults = {};
-				apiResults["status"] = ["未支付","已支付"];
+				apiResults["status"] = ["待审核","审核通过","驳回"];
                 // 编辑或删除行事件
                 table.on("tool(data-table)", function(obj) {
                     if (obj.event === "remove") {

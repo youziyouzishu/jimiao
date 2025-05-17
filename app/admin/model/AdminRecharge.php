@@ -2,6 +2,7 @@
 
 namespace app\admin\model;
 
+use plugin\admin\app\model\Admin;
 use plugin\admin\app\model\Base;
 
 /**
@@ -21,6 +22,7 @@ use plugin\admin\app\model\Base;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminRecharge newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminRecharge newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminRecharge query()
+ * @property string|null $reason 驳回原因
  * @mixin \Eloquent
  */
 class AdminRecharge extends Base
@@ -49,6 +51,11 @@ class AdminRecharge extends Base
         'mobile',
         'status',
     ];
+
+    function admin()
+    {
+        return $this->belongsTo(Admin::class,'admin_id','id');
+    }
     
     
     

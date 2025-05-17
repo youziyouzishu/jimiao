@@ -14,60 +14,19 @@
 
             <div class="mainBox">
                 <div class="main-container mr-5">
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">商户</label>
-                        <div class="layui-input-block">
-                            <input type="number" name="admin_id" value="" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">订单编号</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="ordersn" value="" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">金额</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="amount" value="" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">银行卡号</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="bankcard_no" value="" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">持卡人姓名</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="truename" value="" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">身份证号码</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="idcard_no" value="" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">预留手机号</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="mobile" value="" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
+
                     
                     <div class="layui-form-item">
                         <label class="layui-form-label required">状态</label>
                         <div class="layui-input-block">
                             <div name="status" id="status" required value="" ></div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item reason layui-hide">
+                        <label class="layui-form-label">驳回原因</label>
+                        <div class="layui-input-block">
+                            <textarea name="reason" class="layui-textarea"></textarea>
                         </div>
                     </div>
                     
@@ -139,17 +98,40 @@
                         layui.use(["jquery", "xmSelect"], function() {
                             let value = layui.$("#status").attr("value");
                             let initValue = value ? value.split(",") : [];
-                            layui.xmSelect.render({
+                            let data = [{"value":"0","name":"待审核"},{"value":"1","name":"审核通过"},{"value":"2","name":"驳回"}];
+                            if (value === '1'){
+                                data = [{"value":"1","name":"审核通过"}];
+                            }
+                            if (value === '2'){
+                                data = [{"value":"2","name":"驳回"}];
+                            }
+                            let statusSelect = layui.xmSelect.render({
                                 el: "#status",
                                 name: "status",
                                 filterable: true,
                                 initValue: initValue,
-                                data: [{"value":"0","name":"未支付"},{"value":"1","name":"已支付"}],
+                                data: data,
                                 model: {"icon":"hidden","label":{"type":"text"}},
                                 clickClose: true,
                                 radio: true,
                                 layVerify: "required",
+                                on: function(data){
+                                    //arr:  当前多选已选中的数据
+                                    var arr = data.arr;
+                                    //change, 此次选择变化的数据,数组
+                                    var change = data.change;
+                                    //isAdd, 此次操作是新增还是删除
+                                    var isAdd = data.isAdd;
+                                    if (isAdd && change[0].value === "2"){
+                                        $(".reason").removeClass("layui-hide")
+                                    }else{
+                                        $(".reason").addClass("layui-hide")
+                                    }
+                                    //可以return一个数组, 代表想选中的数据
+                                    //return []
+                                },
                             })
+                            statusSelect.setValue(initValue,false,true);
                         });
                         
                         

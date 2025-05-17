@@ -12,8 +12,6 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-use plugin\admin\app\exception\Handler;
-
 return [
-    '' => \Tinywan\ExceptionHandler\Handler::class,
+    Webman\RateLimiter\Bootstrap::class
 ];

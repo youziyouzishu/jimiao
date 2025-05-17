@@ -199,12 +199,20 @@
                         layui.use(["jquery", "xmSelect"], function() {
                             let value = layui.$("#status").attr("value");
                             let initValue = value ? value.split(",") : [];
+                            let data = [{"value":"0","name":"待审核"},{"value":"1","name":"通过"},{"value":"2","name":"驳回"}];
+                            if (value === '1'){
+                                data = [{"value":"1","name":"通过"}];
+                            }
+                            if (value === '2'){
+                                data = [{"value":"2","name":"驳回"}];
+                            }
+
                             let statusSelect = layui.xmSelect.render({
                                 el: "#status",
                                 name: "status",
                                 filterable: true,
                                 initValue: initValue,
-                                data: [{"value":"0","name":"待审核"},{"value":"1","name":"通过"},{"value":"2","name":"驳回"}],
+                                data:data,
                                 model: {"icon":"hidden","label":{"type":"text"}},
                                 clickClose: true,
                                 radio: true,
