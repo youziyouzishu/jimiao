@@ -37,6 +37,13 @@ class UserController extends Base
      */
     function receive(Request $request):Response
     {
+        try {
+            #限流器 每个用户1秒内只能请求1次
+            Limiter::check('user_' . $request->user_id, 1, 3);
+        } catch (RateLimitException $e) {
+            return $this->fail('请求频繁');
+        }
+
         $ordersn = $request->post('ordersn');
         $order = Orders::where('ordersn',$ordersn)->first();
         if(!$order){
@@ -115,11 +122,12 @@ class UserController extends Base
         if ($amount > $user->money) {
             return $this->fail('余额不足');
         }
+        $ordersn = Pay::generateOrderSn();
         Db::connection('plugin.admin.mysql')->beginTransaction();
         try {
-            User::changeMoney(-$amount, $request->user_id, '提现', 2);
+            User::changeMoney(-$amount, $request->user_id, $ordersn, 2);
             UserWithdraw::create([
-                'ordersn' => Pay::generateOrderSn(),
+                'ordersn' => $ordersn,
                 'user_id' => $request->user_id,
                 'amount' => $amount,
                 'ali_name' => $ali_name,

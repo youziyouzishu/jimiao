@@ -3,10 +3,12 @@
 namespace app\process;
 
 use app\admin\model\Orders;
+use app\admin\model\User;
 use app\admin\model\UserWithdraw;
 use app\api\service\Pay;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use support\Log;
 use Workerman\Crontab\Crontab;
 
 class Task
@@ -52,10 +54,18 @@ class Task
                     'json' => $requestData,
                 ]);
                 $result = $result->getBody()->getContents();
+                Log::info('提现请求结果：'.$withdraw->ordersn);
+                Log::info($result);
                 $result = json_decode($result);
                 if ($result->success == false){
+                    //提现失败
                     $withdraw->status = 2;
+                    $withdraw->reason = $result->message;
+                    User::changeMoney($withdraw->amount,$withdraw->user_id,$withdraw->ordersn,3);
+                }else{
+                    $withdraw->status = 1;
                 }
+                $withdraw->save();
             }
         });
 

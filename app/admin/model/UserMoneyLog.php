@@ -60,6 +60,7 @@ class UserMoneyLog extends Base
         return [
             1 => '兑换',
             2 => '提现',
+            3 => '提现失败'
         ];
     }
 
