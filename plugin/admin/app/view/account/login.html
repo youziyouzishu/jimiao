@@ -80,21 +80,7 @@
         });
 
         $('#register').on('click', function (e) {
-            layer.open({
-                type: 2,
-                title: "注册",
-                shade: 0.1,
-                maxmin: true,
-                area: [common.isModile()?"60%":"30%", common.isModile()?"70%":"60%"],
-                content: "/app/admin/account/register",
-                success: function(layero, index){
-                    // 将关闭弹出层的函数暴露给 iframe 页面
-                    window.closeLayer = function(){
-                        layer.close(index);
-                        location.reload();
-                    };
-                }
-            });
+            window.open('/admin/admin/register', '_blank');
         });
     })
 </script>
