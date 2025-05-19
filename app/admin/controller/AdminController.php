@@ -158,7 +158,12 @@ class AdminController extends Crud
             ]);
             return $this->success('注册成功');
         }
-        return view('admin/register');
+        $name = 'system_config';
+        $config = Option::where('name', $name)->value('value');
+        $config = json_decode($config, true);
+        $title = $config['logo']['title'] ?? 'webman admin';
+        $logo = $config['logo']['image'] ?? '/app/admin/admin/images/logo.png';
+        return view('admin/register',['logo'=>$logo,'title'=>$title]);
     }
 
 }

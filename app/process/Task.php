@@ -37,7 +37,7 @@ class Task
                 $requestParams = [
                     'clientId' => $clientId,
                     'receiver' => $withdraw->ali_account,
-                    'trans_amount' => $withdraw->amount,
+                    'trans_amount' => floatval($withdraw->amount) ,
                     'receiver_name' => $withdraw->ali_name,
                     'out_biz_no' => $withdraw->ordersn,
                     'timestamp' => $timestamp
