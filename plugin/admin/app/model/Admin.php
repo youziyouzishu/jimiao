@@ -28,7 +28,11 @@ use support\Db;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin query()
  * @property int|null $pid 上级
  * @property-read AdminRealinfo|null $realinfo
- * @property string $money
+ * @property string $money 积分
+ * @property string $award_amount 贡献奖
+ * @property int $type  商户类型
+ * @property-read Admin|null $parent
+ * @property string $max_award_amount 最大贡献奖
  * @mixin \Eloquent
  */
 class Admin extends Base
@@ -59,7 +63,9 @@ class Admin extends Base
         'login_at',
         'roles',
         'status',
-        'invitecode'
+        'invitecode',
+        'type',
+        'award_amount'
     ];
 
     public static function generateInvitecode()
@@ -102,6 +108,11 @@ class Admin extends Base
         } catch (\Throwable $e) {
             Db::connection('plugin.admin.mysql')->rollback();
         }
+    }
+
+    function parent()
+    {
+        return $this->belongsTo(self::class, 'pid', 'id');
     }
 
 

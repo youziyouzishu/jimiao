@@ -58,6 +58,20 @@
                     </div>
 
                     <div class="layui-form-item">
+                        <label class="layui-form-label">限制贡献值</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="max_award_amount" value="" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">商户类型</label>
+                        <div class="layui-input-block">
+                            <div name="type" id="type" required value="" ></div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
                         <label class="layui-form-label">禁用</label>
                         <div class="layui-input-block">
                             <input type="checkbox" id="status" lay-filter="status" lay-skin="switch" />
@@ -65,12 +79,12 @@
                         </div>
                     </div>
                     
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">邀请码</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="invitecode" value="" class="layui-input">
-                        </div>
-                    </div>
+<!--                    <div class="layui-form-item">-->
+<!--                        <label class="layui-form-label">邀请码</label>-->
+<!--                        <div class="layui-input-block">-->
+<!--                            <input type="text" name="invitecode" value="" class="layui-input">-->
+<!--                        </div>-->
+<!--                    </div>-->
 
                     
 <!--                    <div class="layui-form-item">-->
@@ -143,6 +157,23 @@
                                 });
                             }
                         });
+
+                        layui.use(["jquery", "xmSelect"], function() {
+                            let value = layui.$("#type").attr("value");
+                            let initValue = value ? value.split(",") : [];
+                            layui.xmSelect.render({
+                                el: "#type",
+                                name: "type",
+                                filterable: true,
+                                initValue: initValue,
+                                data: [{"value":"1","name":"普通"},{"value":"2","name":"代理"}],
+                                model: {"icon":"hidden","label":{"type":"text"}},
+                                clickClose: true,
+                                radio: true,
+                                layVerify: "required",
+                            })
+
+                        });
                         
                         // 字段 头像 avatar
                         layui.use(["upload", "layer"], function() {
@@ -173,31 +204,6 @@
                                 }
                             });
                         });
-                        
-                        // 字段 创建时间 created_at
-                        layui.use(["laydate"], function() {
-                            layui.laydate.render({
-                                elem: "#created_at",
-                                type: "datetime",
-                            });
-                        })
-                        
-                        // 字段 更新时间 updated_at
-                        layui.use(["laydate"], function() {
-                            layui.laydate.render({
-                                elem: "#updated_at",
-                                type: "datetime",
-                            });
-                        })
-                        
-                        // 字段 登录时间 login_at
-                        layui.use(["laydate"], function() {
-                            layui.laydate.render({
-                                elem: "#login_at",
-                                type: "datetime",
-                            });
-                        })
-                        
                         // 字段 禁用 status
                         layui.use(["form"], function() {
                             layui.$("#status").attr("checked", layui.$('input[name="status"]').val() != 0);

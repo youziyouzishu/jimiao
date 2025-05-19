@@ -83,6 +83,7 @@ function storage_admin_upload_attachment(): Response
     try {
         $attachment = \plugin\storage\api\Storage::uploadFile();
         $data = current($attachment);
+        dump($data);
 
         $imageWith = $imageHeight = 0;
         if ($imgInfo = getimagesize($data['url'])) {

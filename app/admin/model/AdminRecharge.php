@@ -23,6 +23,9 @@ use plugin\admin\app\model\Base;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminRecharge newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminRecharge query()
  * @property string|null $reason 驳回原因
+ * @property string $into_amount 到账金额
+ * @property string $service_amount 服务费
+ * @property-read Admin|null $admin
  * @mixin \Eloquent
  */
 class AdminRecharge extends Base
@@ -50,6 +53,8 @@ class AdminRecharge extends Base
         'idcard_no',
         'mobile',
         'status',
+        'into_amount',
+        'service_amount'
     ];
 
     function admin()

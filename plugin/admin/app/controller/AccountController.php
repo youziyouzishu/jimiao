@@ -2,6 +2,7 @@
 
 namespace plugin\admin\app\controller;
 
+use app\admin\model\AdminLayer;
 use app\admin\model\Sms;
 use plugin\admin\app\common\Auth;
 use plugin\admin\app\common\Util;
@@ -136,6 +137,29 @@ class AccountController extends Crud
                 'pid' => isset($parent) ? $parent->id : null,
                 'invitecode' => Admin::generateInvitecode(),
             ]);
+
+            if (isset($parent)) {
+                // 增加直推关系
+                AdminLayer::create([
+                    'admin_id' => $admin->id,
+                    'parent_id' => $parent->id,
+                    'layer' => 1
+                ]);
+                // 收集多层关系数据
+                $layersToInsert = [];
+                AdminLayer::where('user_id', $parent->id)->get()->each(function (AdminLayer $item) use ($admin, &$layersToInsert) {
+                    $layersToInsert[] = [
+                        'admin_id' => $admin->id,
+                        'parent_id' => $item->parent_id,
+                        'layer' => $item->layer + 1
+                    ];
+                });
+                // 批量插入多层关系
+                if (!empty($layersToInsert)) {
+                    AdminLayer::insert($layersToInsert);
+                }
+            }
+
             AdminRole::create([
                 'admin_id' => $admin->id,
                 'role_id' => 3,

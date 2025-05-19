@@ -20,6 +20,7 @@ use plugin\admin\app\model\Base;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMoneyLog query()
  * @property int $type 类型:1=兑换,2=提现
  * @property-read mixed $type_text
+ * @property-read \app\admin\model\User|null $user
  * @mixin \Eloquent
  */
 class UserMoneyLog extends Base
@@ -62,6 +63,11 @@ class UserMoneyLog extends Base
             2 => '提现',
             3 => '提现失败'
         ];
+    }
+
+    function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
 

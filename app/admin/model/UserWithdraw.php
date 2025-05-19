@@ -22,6 +22,7 @@ use plugin\admin\app\model\Base;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWithdraw newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWithdraw query()
  * @property string $ordersn 订单号
+ * @property-read \app\admin\model\User|null $user
  * @mixin \Eloquent
  */
 class UserWithdraw extends Base
@@ -66,6 +67,11 @@ class UserWithdraw extends Base
             1 => '已打款',
             2 => '打款失败',
         ];
+    }
+
+    function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
     
 }

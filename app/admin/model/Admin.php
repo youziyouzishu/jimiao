@@ -5,6 +5,8 @@ namespace app\admin\model;
 use plugin\admin\app\model\Base;
 
 /**
+ * 
+ *
  * @property integer $id ID(主键)
  * @property string $username 用户名
  * @property string $nickname 昵称
@@ -19,6 +21,14 @@ use plugin\admin\app\model\Base;
  * @property string $invitecode 邀请码
  * @property integer $pid 上级
  * @property string $money
+ * @property int $type 商户类型:1=普通,2=代理
+ * @property-read Admin|null $parent
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin query()
+ * @property string $award_amount 贡献奖
+ * @property string $max_award_amount 最大贡献奖
+ * @mixin \Eloquent
  */
 class Admin extends Base
 {

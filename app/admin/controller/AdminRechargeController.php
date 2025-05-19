@@ -71,11 +71,24 @@ class AdminRechargeController extends Crud
     public function insert(Request $request): Response
     {
         if ($request->method() === 'POST') {
+
             $amount = $request->post('amount');
             $bankcard_no = $request->post('bankcard_no');
             $truename = $request->post('truename');
             $idcard_no = $request->post('idcard_no');
             $mobile = $request->post('mobile');
+
+            if (empty($amount) || $amount <= 0){
+                return $this->fail('充值金额必须大于0');
+            }
+
+            if ($amount <= 10){
+                $service_amount = 0.09;
+                $into_amount = $amount - $service_amount;
+            }else{
+                $service_amount = bcmul($amount, '0.009', 2);
+                $into_amount = bcsub($amount, $service_amount, 2);
+            }
             $ordersn = Pay::generateOrderSn();
             $client = new Client();
             $url = 'http://8.130.185.57:3000/api/payment-request';
@@ -115,6 +128,8 @@ class AdminRechargeController extends Crud
             $request->setParams('post',[
                 'ordersn' => $ordersn,
                 'admin_id' => $admin_id,
+                'service_amount' => $service_amount,
+                'into_amount' => $into_amount,
             ]);
             $data = $this->insertInput($request);
             $id = $this->doInsert($data);
@@ -138,6 +153,18 @@ class AdminRechargeController extends Crud
             if ($row->status ==0 && $status == 1){
                 //审核通过  增加余额
                 Admin::changeMoney($row->amount,$row->admin_id,'充值',2);
+                //如果此商户有上级  并且上级是代理
+                if ($row->admin->parent && $row->admin->parent->type == 2){
+                    $award_amount = bcmul($row->amount, '0.005', 2);#贡献奖
+                    if ($row->admin->parent->max_award_amount > $row->admin->parent->award_amount){
+                        if ($row->admin->parent->max_award_amount - $row->admin->parent->award_amount < $award_amount){
+                            $award_amount = $row->admin->parent->max_award_amount - $row->admin->parent->award_amount;
+                        }
+                        Admin::changeMoney($award_amount,$row->admin->parent->id,'充值订单:'.$row->ordersn,3);
+                        $row->admin->parent->award_amount += $award_amount;
+                        $row->admin->parent->save();
+                    }
+                }
             }
 
             return parent::update($request);
