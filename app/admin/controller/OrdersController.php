@@ -100,7 +100,7 @@ class OrdersController extends Crud
                 for ($i = 1; $i <= $num; $i++) {
                     $ordersn = mb_strtoupper(bin2hex(random_bytes(8)));
                     Orders::create([
-                        'admin_id ' => $admin_id,
+                        'admin_id' => $admin_id,
                         'ordersn' => $ordersn,
                         'amount' => $amount,
                         'start_time' => $start_time,

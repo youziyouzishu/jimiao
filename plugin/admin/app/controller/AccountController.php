@@ -24,7 +24,7 @@ class AccountController extends Crud
      * 不需要登录的方法
      * @var string[]
      */
-    protected $noNeedLogin = ['login', 'logout', 'captcha','register'];
+    protected $noNeedLogin = ['login', 'logout', 'captcha'];
 
     /**
      * 不需要鉴权的方法

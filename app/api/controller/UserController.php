@@ -31,6 +31,21 @@ class UserController extends Base
     }
 
     /**
+     * 绑定支付宝账号
+     * @param Request $request
+     */
+    function setAliAccount(Request $request)
+    {
+        $ali_name = $request->post('ali_name');
+        $ali_account = $request->post('ali_account');
+        $user = User::find($request->user_id);
+        $user->ali_name = $ali_name;
+        $user->ali_account = $ali_account;
+        $user->save();
+        return $this->success('成功');
+    }
+
+    /**
      * 兑换口令
      * @param Request $request
      * @return Response
@@ -113,8 +128,7 @@ class UserController extends Base
             return $this->fail('请求频繁');
         }
 
-        $ali_name = $request->post('ali_name');
-        $ali_account = $request->post('ali_account');
+
         $amount = $request->post('amount');
         if (empty($amount) || $amount <= 0) {
             return $this->fail('提现金额必须大于0');
@@ -122,6 +136,11 @@ class UserController extends Base
         $user = User::find($request->user_id);
         if ($amount > $user->money) {
             return $this->fail('余额不足');
+        }
+        $ali_name = $user->ali_name;
+        $ali_account = $user->ali_account;
+        if (empty($ali_name) || empty($ali_account)) {
+            return $this->fail('请先绑定支付宝账号');
         }
         $ordersn = Pay::generateOrderSn();
         Db::connection('plugin.admin.mysql')->beginTransaction();

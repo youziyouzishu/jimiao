@@ -69,6 +69,7 @@ class AdminMoneyLog extends Base
         return [
             1 => '兑换',
             2 => '充值',
+            3 => '贡献奖',
         ];
     }
 

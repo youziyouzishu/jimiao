@@ -36,6 +36,8 @@ use support\Db;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \app\admin\model\UserWithdraw> $withdraw
+ * @property string|null $ali_name 支付宝姓名
+ * @property string|null $ali_account 支付宝账号
  * @mixin \Eloquent
  */
 class User extends Base
