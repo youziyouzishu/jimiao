@@ -23,6 +23,10 @@ Route::fallback(function () {
     }
 });
 
+Route::any('/h5/', function () {
+    return new Response(200, [], file_get_contents(public_path() . '/h5/index.html'));
+});
+
 
 
 

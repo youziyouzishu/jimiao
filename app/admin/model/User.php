@@ -35,6 +35,7 @@ use support\Db;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \app\admin\model\UserWithdraw> $withdraw
  * @mixin \Eloquent
  */
 class User extends Base
@@ -104,6 +105,11 @@ class User extends Base
             Db::connection('plugin.admin.mysql')->rollback();
             throw $e;
         }
+    }
+
+    function withdraw()
+    {
+        return $this->hasMany(UserWithdraw::class, 'user_id', 'id');
     }
 
 

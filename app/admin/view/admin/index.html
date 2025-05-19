@@ -34,6 +34,13 @@
                             <input type="text" name="mobile" value="" class="layui-input">
                         </div>
                     </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">上级</label>
+                        <div class="layui-input-block">
+                            <div name="pid" id="pid" value="" ></div>
+                        </div>
+                    </div>
                     
                     <div class="layui-form-item">
                         <label class="layui-form-label">创建时间</label>
@@ -83,6 +90,7 @@
         <!-- 表格行工具栏 -->
         <script type="text/html" id="table-bar">
             <button class="pear-btn pear-btn-xs tool-btn" lay-event="copy">推广链接</button>
+            <button class="pear-btn pear-btn-xs tool-btn" lay-event="layer">下级列表</button>
             <button class="pear-btn pear-btn-xs tool-btn" lay-event="edit" permission="admin.admin.update">编辑</button>
             <button class="pear-btn pear-btn-xs tool-btn" lay-event="remove" permission="admin.admin.delete">删除</button>
         </script>
@@ -93,15 +101,22 @@
         <script src="/app/admin/admin/js/common.js"></script>
         
         <script>
+            const pid = layui.url().search['pid'];
 
             // 相关常量
             const PRIMARY_KEY = "id";
-            const SELECT_API = "/admin/admin/select";
-            const UPDATE_API = "/admin/admin/update";
-            const DELETE_API = "/admin/admin/delete";
-            const INSERT_URL = "/admin/admin/insert";
-            const UPDATE_URL = "/admin/admin/update";
-            
+            let SELECT_API = "/admin/admin/select";
+            let UPDATE_API = "/admin/admin/update";
+            let DELETE_API = "/admin/admin/delete";
+            let INSERT_URL = "/admin/admin/insert";
+            let UPDATE_URL = "/admin/admin/update";
+            if (pid !== 'undefined' && pid != null){
+                 SELECT_API = "/admin/admin/select" + '?pid=' + pid;
+                 UPDATE_API = "/admin/admin/update";
+                 DELETE_API = "/admin/admin/delete";
+                 INSERT_URL = "/admin/admin/insert" + '?pid=' + pid;
+                 UPDATE_URL = "/admin/admin/update" + '?pid=' + pid;
+            }
             // 字段 创建时间 created_at
             layui.use(["laydate"], function() {
                 layui.laydate.render({
@@ -110,6 +125,46 @@
                     type: "datetime",
                 });
             })
+
+            layui.use(["jquery", "xmSelect", "popup"], function() {
+                let value = layui.$("#pid").attr("value");
+                let initValue = value ? value.split(",") : [];
+                layui.xmSelect.render({
+                    el: '#pid',
+                    name: "pid",
+                    //配置搜索
+                    filterable: true,
+                    //配置远程分页
+                    clickClose: true,
+                    paging: true,
+                    pageRemote: true,
+                    radio: true,
+                    remoteSearch:true,
+                    initValue: initValue,
+                    template({ item, sels, name, value }){
+                        return name + '<span style="position: absolute; right: 10px; color: #8799a3">'+value+'</span>'
+                    },
+                    prop: {
+                        name: 'nickname',
+                        value: 'id',
+                    },
+                    //数据处理
+                    remoteMethod: function(val, cb, show, pageIndex){
+                        layui.$.ajax({
+                            url: "/admin/admin/select",
+                            dataType: "json",
+                            data: {
+                                username: val,
+                                page: pageIndex,
+                            },
+                            success: function (res) {
+                                //回调需要两个参数, 第一个: 数据数组, 第二个: 总页码
+                                cb(res.data,res.count)
+                            }
+                        });
+                    }
+                })
+            });
             
             // 表格渲染
             layui.use(["table", "form", "common", "popup", "util"], function() {
@@ -206,7 +261,7 @@
 						toolbar: "#table-bar",
 						align: "center",
 						fixed: "right",
-						width: 170,
+						width: 250,
 					}
 				];
 				
@@ -242,6 +297,8 @@
                         edit(obj);
                     } else if (obj.event === "copy") {
                         copy(obj);
+                    } else if (obj.event === "layer") {
+                        layers(obj);
                     }
                 });
 
@@ -328,8 +385,19 @@
                     navigator.clipboard.writeText(url).then(function() {
                         layui.popup.success("链接已复制到剪贴板");
                     }).catch(function(err) {
-                        console.error("复制失败: ", err);
                         layui.popup.failure("复制失败，请手动复制");
+                    });
+                }
+
+                let layers = function(obj) {
+                    let value = obj.data[PRIMARY_KEY];
+                    layer.open({
+                        type: 2,
+                        title: "下级列表",
+                        shade: 0.1,
+                        maxmin: true,
+                        area: [common.isModile()?"100%":"90%", common.isModile()?"100%":"90%"],
+                        content: "/admin/admin/index" + "?" + 'pid' + "=" + value
                     });
                 }
 

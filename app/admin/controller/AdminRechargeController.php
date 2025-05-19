@@ -153,16 +153,16 @@ class AdminRechargeController extends Crud
             if ($row->status ==0 && $status == 1){
                 //审核通过  增加余额
                 Admin::changeMoney($row->amount,$row->admin_id,'充值',2);
-                //如果此商户有上级  并且上级是代理
-                if ($row->admin->parent && $row->admin->parent->type == 2){
+                //如果此商户有上级  并且此商户是普通商户
+                if ($row->admin->parent && $row->admin->type == 1){
                     $award_amount = bcmul($row->amount, '0.005', 2);#贡献奖
-                    if ($row->admin->parent->max_award_amount > $row->admin->parent->award_amount){
-                        if ($row->admin->parent->max_award_amount - $row->admin->parent->award_amount < $award_amount){
-                            $award_amount = $row->admin->parent->max_award_amount - $row->admin->parent->award_amount;
+                    if ($row->admin->max_award_amount > $row->admin->award_amount){
+                        if ($row->admin->max_award_amount - $row->admin->award_amount < $award_amount){
+                            $award_amount = $row->admin->max_award_amount - $row->admin->award_amount;
                         }
                         Admin::changeMoney($award_amount,$row->admin->parent->id,'充值订单:'.$row->ordersn,3);
-                        $row->admin->parent->award_amount += $award_amount;
-                        $row->admin->parent->save();
+                        $row->admin->award_amount += $award_amount;
+                        $row->admin->save();
                     }
                 }
             }

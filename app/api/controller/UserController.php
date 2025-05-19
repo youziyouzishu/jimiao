@@ -25,8 +25,9 @@ class UserController extends Base
      */
     function getUserInfo(Request $request)
     {
-        $row = User::find($request->user_id);
-        return $this->success('成功', $row);
+        $user = User::find($request->user_id);
+        $user->setAttribute('withdraw_amount',$user->withdraw()->where('status',1)->sum('amount'));
+        return $this->success('成功', $user);
     }
 
     /**

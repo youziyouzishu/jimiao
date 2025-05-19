@@ -60,11 +60,11 @@ class Task
                 if ($result->success == false){
                     //提现失败
                     $withdraw->status = 2;
-                    $withdraw->reason = $result->message;
                     User::changeMoney($withdraw->amount,$withdraw->user_id,$withdraw->ordersn,3);
                 }else{
                     $withdraw->status = 1;
                 }
+                $withdraw->reason = $result->message;
                 $withdraw->save();
             }
         });
