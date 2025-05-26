@@ -121,7 +121,7 @@
                             }
                         });
                         
-                        // 字段 类型:1=兑换,2=充值 type
+                        // 字段 类型:1=导入订单,2=充值 type
                         layui.use(["jquery", "xmSelect"], function() {
                             let value = layui.$("#type").attr("value");
                             let initValue = value ? value.split(",") : [];
@@ -130,7 +130,7 @@
                                 name: "type",
                                 filterable: true,
                                 initValue: initValue,
-                                data: [{"value":"1","name":"兑换"},{"value":"2","name":"充值"},{"value":"3","name":"贡献奖"}],
+                                data: [{"value":"1","name":"导入订单"},{"value":"2","name":"充值"},{"value":"3","name":"贡献奖"}],
                                 model: {"icon":"hidden","label":{"type":"text"}},
                                 clickClose: true,
                                 radio: true,

@@ -37,10 +37,10 @@ return [
         'cache_token_ttl' => 604800,
 
         /** 缓存令牌前缀，默认 JWT:TOKEN: */
-        'cache_token_pre' => 'JWT:TOKEN:',
+        'cache_token_pre' => 'JWT:TOKEN:jimiao:',
 
         /** 缓存刷新令牌前缀，默认 JWT:REFRESH_TOKEN: */
-        'cache_refresh_token_pre' => 'JWT:REFRESH_TOKEN:',
+        'cache_refresh_token_pre' => 'JWT:REFRESH_TOKEN:jimiao:',
 
         /** 用户信息模型 */
         'user_model' => function ($uid) {

@@ -26,6 +26,10 @@ use plugin\admin\app\model\Base;
  * @property string $into_amount 到账金额
  * @property string $service_amount 服务费
  * @property-read Admin|null $admin
+ * @property string $recharge_bankcard_no 收款卡号
+ * @property string $recharge_truename 收款人
+ * @property string $recharge_bankname 收款银行
+ * @property string $recharge_branch 收款支行
  * @mixin \Eloquent
  */
 class AdminRecharge extends Base

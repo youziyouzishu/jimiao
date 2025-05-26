@@ -13,14 +13,6 @@
         <div class="layui-card">
             <div class="layui-card-body">
                 <form class="layui-form top-search-from">
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">主键</label>
-                        <div class="layui-input-block">
-                            <input type="number" name="id" value="" class="layui-input">
-                        </div>
-                    </div>
-                    
                     <div class="layui-form-item">
                         <label class="layui-form-label">状态</label>
                         <div class="layui-input-block">
@@ -205,6 +197,7 @@
 				    size: "lg",
 				    toolbar: "#table-toolbar",
 				    autoSort: false,
+                    cellMinWidth:170,
 				    defaultToolbar: [{
 				        title: "刷新",
 				        layEvent: "refresh",

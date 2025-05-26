@@ -47,7 +47,7 @@ class AdminController extends Crud
         $ids = AdminRole::where('role_id',3)->pluck('admin_id');
         $query = $this->doSelect($where, $field, $order)->whereIn('id',$ids)->with(['parent']);
         if (in_array(3, admin('roles'))) {
-            $query->where('admin_id', admin_id());
+            $query->where('id', admin_id());
         }
         return $this->doFormat($query, $format, $limit);
     }
@@ -58,7 +58,12 @@ class AdminController extends Crud
      */
     public function index(): Response
     {
-        return view('admin/index');
+        if (in_array(3, admin('roles'))) {
+            $type = 'merchant';
+        }else{
+            $type = 'admin';
+        }
+        return view('admin/index',['type' => $type]);
     }
 
     /**

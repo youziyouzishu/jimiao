@@ -2,6 +2,7 @@
 
 namespace app\admin\controller;
 
+use app\admin\model\AdminRealinfo;
 use app\api\service\Pay;
 use GuzzleHttp\Client;
 use plugin\admin\app\model\Admin;
@@ -12,11 +13,11 @@ use plugin\admin\app\controller\Crud;
 use support\exception\BusinessException;
 
 /**
- * 商户充值记录 
+ * 商户充值记录
  */
 class AdminRechargeController extends Crud
 {
-    
+
     /**
      * @var AdminRecharge
      */
@@ -30,7 +31,7 @@ class AdminRechargeController extends Crud
     {
         $this->model = new AdminRecharge;
     }
-    
+
     /**
      * 浏览
      * @return Response
@@ -40,10 +41,10 @@ class AdminRechargeController extends Crud
         $roles = admin('roles');
         if (in_array(3, $roles)) {
             $show = true;
-        }else{
+        } else {
             $show = false;
         }
-        return view('admin-recharge/index',['show'=>$show]);
+        return view('admin-recharge/index', ['show' => $show]);
     }
 
     /**
@@ -71,24 +72,26 @@ class AdminRechargeController extends Crud
     public function insert(Request $request): Response
     {
         if ($request->method() === 'POST') {
-
             $amount = $request->post('amount');
             $bankcard_no = $request->post('bankcard_no');
             $truename = $request->post('truename');
             $idcard_no = $request->post('idcard_no');
             $mobile = $request->post('mobile');
-
-            if (empty($amount) || $amount <= 0){
+            $realinfo = AdminRealinfo::where('admin_id', admin_id())->where('status', 1)->first();
+            if (empty($realinfo)) {
+                return $this->fail('请先完善实名认证信息');
+            }
+            if ($realinfo->truename != $truename) {
+                return $this->fail('请使用实名姓名');
+            }
+            if (empty($amount) || $amount <= 0) {
                 return $this->fail('充值金额必须大于0');
             }
 
-            if ($amount <= 10){
-                $service_amount = 0.09;
-                $into_amount = $amount - $service_amount;
-            }else{
-                $service_amount = bcmul($amount, '0.009', 2);
-                $into_amount = bcsub($amount, $service_amount, 2);
-            }
+
+            $service_amount = bcmul($amount, '0.01', 2);
+            $into_amount = bcsub($amount, $service_amount, 2);
+
             $ordersn = Pay::generateOrderSn();
             $client = new Client();
             $url = 'http://8.130.185.57:3000/api/payment-request';
@@ -121,21 +124,28 @@ class AdminRechargeController extends Crud
             ]);
             $result = $result->getBody()->getContents();
             $result = json_decode($result);
-            if ($result->success == false){
+
+            if ($result->success == false) {
                 return $this->fail($result->message);
             }
             $admin_id = admin_id();
-            $request->setParams('post',[
+            $params = [
                 'ordersn' => $ordersn,
                 'admin_id' => $admin_id,
                 'service_amount' => $service_amount,
                 'into_amount' => $into_amount,
-            ]);
+                'recharge_bankcard_no' => $result->bankInfo->accountNumber,
+                'recharge_truename' => $result->bankInfo->accountName,
+                'recharge_bankname' => $result->bankInfo->bankName,
+                'recharge_branch' => $result->bankInfo->branch,
+            ];
+            $request->setParams('post', $params);
             $data = $this->insertInput($request);
             $id = $this->doInsert($data);
-            return $this->success();
+            return $this->json(0, 'ok', $params);
         }
-        return view('admin-recharge/insert');
+        $recharge_info_last = AdminRecharge::where('admin_id', admin_id())->orderBy('id', 'desc')->first();
+        return view('admin-recharge/insert',  ['recharge_info_last' => $recharge_info_last]);
     }
 
     /**
@@ -143,24 +153,24 @@ class AdminRechargeController extends Crud
      * @param Request $request
      * @return Response
      * @throws BusinessException
-    */
+     */
     public function update(Request $request): Response
     {
         if ($request->method() === 'POST') {
             $status = $request->post('status');
             $id = $request->post('id');
             $row = $this->model->find($id);
-            if ($row->status ==0 && $status == 1){
+            if ($row->status == 0 && $status == 1) {
                 //审核通过  增加余额
-                Admin::changeMoney($row->amount,$row->admin_id,'充值',2);
+                Admin::changeMoney($row->into_amount, $row->admin_id, '充值', 2);
                 //如果此商户有上级  并且此商户是普通商户
-                if ($row->admin->parent && $row->admin->type == 1){
+                if ($row->admin->parent) {
                     $award_amount = bcmul($row->amount, '0.005', 2);#贡献奖
-                    if ($row->admin->max_award_amount > $row->admin->award_amount){
-                        if ($row->admin->max_award_amount - $row->admin->award_amount < $award_amount){
+                    if ($row->admin->max_award_amount > $row->admin->award_amount) {
+                        if ($row->admin->max_award_amount - $row->admin->award_amount < $award_amount) {
                             $award_amount = $row->admin->max_award_amount - $row->admin->award_amount;
                         }
-                        Admin::changeMoney($award_amount,$row->admin->parent->id,'充值订单:'.$row->ordersn,3);
+                        Admin::changeMoney($award_amount, $row->admin->parent->id, '充值订单:' . $row->ordersn, 3);
                         $row->admin->award_amount += $award_amount;
                         $row->admin->save();
                     }

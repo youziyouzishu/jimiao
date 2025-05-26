@@ -3,6 +3,7 @@
 namespace app\admin\model;
 
 use plugin\admin\app\model\Base;
+use support\Db;
 
 /**
  * 
@@ -28,6 +29,7 @@ use plugin\admin\app\model\Base;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin query()
  * @property string $award_amount 贡献奖
  * @property string $max_award_amount 最大贡献奖
+ * @property-read \app\admin\model\AdminRealinfo|null $realinfo
  * @mixin \Eloquent
  */
 class Admin extends Base
@@ -46,9 +48,70 @@ class Admin extends Base
      */
     protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'username',
+        'nickname',
+        'password',
+        'avatar',
+        'email',
+        'mobile',
+        'created_at',
+        'updated_at',
+        'login_at',
+        'status',
+        'invitecode',
+        'pid',
+        'money',
+        'type',
+        'award_amount',
+        'max_award_amount',
+    ];
+
+    public static function generateInvitecode()
+    {
+        do {
+            $invitecode = mt_rand(10000, 99999);
+        } while (self::where(['invitecode' => $invitecode])->exists());
+        return $invitecode;
+    }
+
+    function realinfo()
+    {
+        return $this->hasOne(AdminRealinfo::class, 'admin_id', 'id');
+    }
+
+
+    /**
+     * 变更商户金额
+     * @param int $money 金额
+     * @param int $admin_id 商户ID
+     * @param string $memo 备注
+     * @param int $type 类型
+     * @throws \Throwable
+     */
+    public static function changeMoney($money, $admin_id, $memo, $type)
+    {
+        Db::connection('plugin.admin.mysql')->beginTransaction();
+        try {
+            $admin = Admin::lockForUpdate()->find($admin_id);
+            if ($admin && $money != 0) {
+                $before = $admin->money;
+                $after = function_exists('bcadd') ? bcadd($admin->money, $money, 2) : $admin->money + $money;
+                //更新会员信息
+                $admin->money = $after;
+                $admin->save();
+                //写入日志
+                AdminMoneyLog::create(['admin_id' => $admin->id, 'money' => $money, 'before' => $before, 'after' => $after, 'memo' => $memo, 'type' => $type]);
+            }
+            Db::connection('plugin.admin.mysql')->commit();
+        } catch (\Throwable $e) {
+            Db::connection('plugin.admin.mysql')->rollback();
+        }
+    }
+
     function parent()
     {
-        return $this->belongsTo(Admin::class, 'pid', 'id');
+        return $this->belongsTo(self::class, 'pid', 'id');
     }
     
     

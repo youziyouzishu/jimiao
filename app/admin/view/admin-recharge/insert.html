@@ -2,7 +2,7 @@
 <html lang="zh-cn">
     <head>
         <meta charset="UTF-8">
-        <title>新增页面</title>
+        <title>充值页面</title>
         <link rel="stylesheet" href="/app/admin/component/pear/css/pear.css" />
         <link rel="stylesheet" href="/app/admin/component/jsoneditor/css/jsoneditor.css" />
         <link rel="stylesheet" href="/app/admin/admin/css/reset.css" />
@@ -24,28 +24,28 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label required">银行卡号</label>
                         <div class="layui-input-block">
-                            <input type="text" name="bankcard_no" value="" required lay-verify="required" class="layui-input">
+                            <input type="text" name="bankcard_no" value="<?= htmlspecialchars($recharge_info_last['bankcard_no'] ?? '') ?>" required lay-verify="required" class="layui-input">
                         </div>
                     </div>
                     
                     <div class="layui-form-item">
                         <label class="layui-form-label required">持卡人姓名</label>
                         <div class="layui-input-block">
-                            <input type="text" name="truename" value="" required lay-verify="required" class="layui-input">
+                            <input type="text" name="truename" value="<?= htmlspecialchars($recharge_info_last['truename'] ?? '') ?>" required lay-verify="required" class="layui-input">
                         </div>
                     </div>
                     
                     <div class="layui-form-item">
                         <label class="layui-form-label required">身份证号码</label>
                         <div class="layui-input-block">
-                            <input type="text" name="idcard_no" value="" required lay-verify="required" class="layui-input">
+                            <input type="text" name="idcard_no" value="<?= htmlspecialchars($recharge_info_last['idcard_no'] ?? '') ?>" required lay-verify="required" class="layui-input">
                         </div>
                     </div>
                     
                     <div class="layui-form-item">
                         <label class="layui-form-label required">预留手机号</label>
                         <div class="layui-input-block">
-                            <input type="text" name="mobile" value="" required lay-verify="required" class="layui-input">
+                            <input type="text" name="mobile" value="<?= htmlspecialchars($recharge_info_last['mobile'] ?? '') ?>" required lay-verify="required" class="layui-input">
                         </div>
                     </div>
                     
@@ -72,12 +72,10 @@
         <script src="/app/admin/admin/js/permission.js"></script>
         
         <script>
-            
             // 相关接口
             const INSERT_API = "/admin/admin-recharge/insert";
-            
-            //提交事件
-            layui.use(["form", "popup"], function () {
+            // 提交事件
+            layui.use(["form", "popup","table", "common", "util"], function () {
                 // 字段验证允许为空
                 layui.form.verify({
                     phone: [/(^$)|^1\d{10}$/, "请输入正确的手机号"],
@@ -100,6 +98,52 @@
                             return layui.popup.success("操作成功", function () {
                                 parent.refreshTable();
                                 parent.layer.close(parent.layer.getFrameIndex(window.name));
+                                // 假设 res.data 包含银行卡信息
+                                const data = res.data || {};
+                                // 构建银行卡信息的 HTML 内容
+                                const content = `
+        <form class="layui-form" action="">
+
+                <div class="main-container mr-5">
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">收款卡号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="recharge_bankcard_no" value="${data.recharge_bankcard_no || ''}" readonly class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">收款人</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="recharge_truename" value="${data.recharge_truename || ''}" readonly class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">收款银行</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="recharge_bankname" value="${data.recharge_bankname || ''}" readonly class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">收款支行</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="recharge_branch" value="${data.recharge_branch || ''}" readonly class="layui-input">
+                        </div>
+                    </div>
+                </div>
+        </form>
+`;
+                                // 打开弹窗显示银行卡信息
+                                parent.layer.open({
+                                    type: 1,
+                                    title: "银行卡信息",
+                                    area: ['30%', '45%'], // 宽高
+                                    content: content,
+                                    btn:  ['关闭'],
+                                });
                             });
                         }
                     });

@@ -65,17 +65,22 @@
 
         <!-- 表格顶部工具栏 -->
         <script type="text/html" id="table-toolbar">
-            <?php if ($show == true): ?>
+
             <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add" permission="admin.orders.insert">
                 <i class="layui-icon layui-icon-add-1"></i>随机生成
             </button>
             <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="import" permission="admin.orders.import">
                 <i class="layui-icon layui-icon-add-1"></i>导入
             </button>
-            <?php endif; ?>
+            <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="download" permission="admin.orders.download">
+                <i class="layui-icon layui-icon-download-circle"></i>下载模板
+            </button>
+
             <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove" permission="admin.orders.delete">
                 <i class="layui-icon layui-icon-delete"></i>删除
             </button>
+
+            <span style="color:red;" class="layui-icon layui-icon-tips">请勿修改模板中第一行内容</span>
         </script>
 
         <!-- 表格行工具栏 -->
@@ -202,6 +207,7 @@
 				    skin: "line",
 				    size: "lg",
 				    toolbar: "#table-toolbar",
+                    cellMinWidth:170,
 				    autoSort: false,
 				    defaultToolbar: [{
 				        title: "刷新",
@@ -235,6 +241,8 @@
                         batchRemove(obj);
                     } else if (obj.event === "import") {
                         handleImport();
+                    } else if (obj.event === "download") {
+                        window.location.href = "/导入模板.xls";
                     }
                 });
 

@@ -223,7 +223,7 @@
 							});
 							let checked = d[field] === 1 ? "checked" : "";
 							return '<input type="checkbox" value="'+util.escape(d[PRIMARY_KEY])+'" lay-filter="'+util.escape(field)+'" lay-skin="switch" lay-text="'+util.escape('')+'" '+checked+'/>';
-						}
+						},
 					},{
 						title: "邀请码",align: "center",
 						field: "invitecode",
@@ -239,9 +239,8 @@
 					},{
                         title: "贡献值",align: "center",
                         field: "award_amount",
-
                     },{
-                        title: "限制贡献值",align: "center",
+                        title: "贡献值上限",align: "center",
                         field: "max_award_amount",
                         width: 100,
                     },{
@@ -286,6 +285,15 @@
 				    }, "filter", "print", "exports"],
 				    done: function () {
 				        layer.photos({photos: 'div[lay-id="data-table"]', anim: 5});
+                        <?php if ($type == 'merchant'): ?>
+                        table.hideCol('data-table', [{
+                            field: 'max_award_amount',
+                            hide: true
+                        }, {
+                            field: 'status',
+                            hide: true
+                        }]);
+                        <?php endif; ?>
 				    }
 				});
 

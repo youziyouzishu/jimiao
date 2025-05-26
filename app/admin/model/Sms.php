@@ -86,47 +86,18 @@ class Sms extends Base
     {
         $code = is_null($code) ? mt_rand(1000, 9999) : $code;
         $ip = request()->getRealIp();
-
-//        $tagName = 'sendCaptcha';
-//        \plugin\sms\api\Sms::sendByTag('13781176253', $tagName, [
-//            'code' => '1234'
-//        ]);
-
-        $client = new Client();
-        // 定义请求的 URL 和数据
-        $url = 'http://sms.lifala.com.cn/api/KehuSms/send';
-        $data = [
-            'appid' => 'apsms1756300803',
-            'key' => 'QxpgdWyCEEYFghWyHZUatiBq5rLcXydH',
-            'mobile' => $mobile,
-            'code' => $code,
-        ];
         try {
-            // 发送异步 POST 请求
-            $promise = $client->postAsync($url, [
-                'json' => $data
+
+            $tagName = 'sendCaptcha';
+            \plugin\sms\api\Sms::sendByTag($mobile, $tagName, [
+                'code' => $code
             ]);
-            // 处理响应
-            $promise->then(
-                function ($response) use ($event, $mobile, $code, $ip) {
-                    $response = $response->getBody()->getContents();
-                    $response = json_decode($response);
-                    if ($response->code != 1) {
-                        throw new \Exception($response->msg);
-                    }
-                    self::create([
-                        'event' => $event,
-                        'mobile' => $mobile,
-                        'code' => $code,
-                        'ip' => $ip
-                    ]);
-                },
-                function ($exception) {
-                    throw new \Exception($exception->getMessage());
-                }
-            );
-            // 等待所有异步请求完成
-            \GuzzleHttp\Promise\Utils::settle([$promise])->wait();
+            self::create([
+                'event' => $event,
+                'mobile' => $mobile,
+                'code' => $code,
+                'ip' => $ip
+            ]);
             return true;
         } catch (\Throwable $e) {
             Log::info('短信警告：' . $e->getMessage());

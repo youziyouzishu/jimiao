@@ -78,8 +78,15 @@ class IndexController
             $day7_detail[substr($date, 5)] = User::where('created_at', '>', "$date 00:00:00")
                 ->where('created_at', '<', "$date 23:59:59")->count();
         }
-
+        if (in_array(3, admin('roles'))) {
+            $type = 'merchant';
+        }else{
+            $type = 'admin';
+        }
         return raw_view('index/dashboard', [
+            'money' => admin('money'),
+            'award_amount' => admin('award_amount'),
+            'type' =>  $type,
             'today_user_count' => $today_user_count,
             'day7_user_count' => $day7_user_count,
             'day30_user_count' => $day30_user_count,

@@ -21,7 +21,7 @@ use plugin\admin\app\model\Base;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminMoneyLog newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminMoneyLog query()
  * @property-read Admin|null $admin
- * @property int $type 类型:1=兑换,2=充值
+ * @property int $type 类型:1=导入订单,2=充值,3=贡献奖
  * @property-read string $type_text
  * @mixin \Eloquent
  */
@@ -67,7 +67,7 @@ class AdminMoneyLog extends Base
     public function getTypeList()
     {
         return [
-            1 => '兑换',
+            1 => '导入订单',
             2 => '充值',
             3 => '贡献奖',
         ];

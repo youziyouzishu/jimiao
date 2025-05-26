@@ -71,9 +71,6 @@ class UserController extends Base
         if($order->end_time->isPast()){
             return $this->fail('口令已过期');
         }
-        if ($order->admin->money < $order->amount){
-            return $this->fail('商家余额不足');
-        }
         #进行领取
         Db::connection('plugin.admin.mysql')->beginTransaction();
         try {
@@ -83,8 +80,6 @@ class UserController extends Base
             $order->save();
             #增加用户余额
             User::changeMoney($order->amount,$order->user_id,$order->ordersn,1);
-            #减少商家余额
-            Admin::changeMoney(-$order->amount,$order->admin_id,$order->ordersn,1);
             Db::connection('plugin.admin.mysql')->commit();
         } catch (\Throwable $e) {
             Db::connection('plugin.admin.mysql')->rollback();

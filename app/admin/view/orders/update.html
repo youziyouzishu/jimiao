@@ -14,44 +14,9 @@
 
             <div class="mainBox">
                 <div class="main-container mr-5">
-                    
+
                     <div class="layui-form-item">
-                        <label class="layui-form-label required">商户</label>
-                        <div class="layui-input-block">
-                            <input type="number" name="admin_id" value="" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">订单号</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="ordersn" value="" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">金额</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="amount" value="" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">开始时间</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="start_time" id="start_time" required lay-verify="required" autocomplete="off" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">结束时间</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="end_time" id="end_time" required lay-verify="required" autocomplete="off" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">状态</label>
+                        <label class="layui-form-label required">状态</label>
                         <div class="layui-input-block">
                             <div name="status" id="status" value="" ></div>
                         </div>
@@ -141,12 +106,26 @@
                         layui.use(["jquery", "xmSelect"], function() {
                             let value = layui.$("#status").attr("value");
                             let initValue = value ? value.split(",") : [];
+                            let data = [{"value":"0","name":"待领取"},{"value":"1","name":"已领取"},{"value":"2","name":"已过期"},{"value":"3","name":"已作废"}];
+                            if (value === "0") {
+                                data = [{"value":"0","name":"待领取"},{"value":"3","name":"作废"}];
+                            }
+                            if (value === "1") {
+                                data = [{"value":"1","name":"已领取"}];
+                            }
+                            if (value === "2") {
+                                data = [{"value":"2","name":"已过期"}];
+                            }
+                            if (value === "3") {
+                                data = [{"value":"3","name":"已作废"}];
+                            }
                             layui.xmSelect.render({
                                 el: "#status",
                                 name: "status",
                                 filterable: true,
+                                layVerify:  "required",
                                 initValue: initValue,
-                                data: [{"value":"0","name":"待领取"},{"value":"1","name":"已领取"},{"value":"2","name":"已过期"},{"value":"3","name":"已作废"}],
+                                data: data,
                                 model: {"icon":"hidden","label":{"type":"text"}},
                                 clickClose: true,
                                 radio: true,

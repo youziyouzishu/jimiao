@@ -9,22 +9,14 @@
     </head>
     <body>
 
-        <form class="layui-form" action="">
-
+        <form class="layui-form"  enctype="multipart/form-data" action="">
             <div class="mainBox">
                 <div class="main-container mr-5">
 
                     <div class="layui-form-item">
                         <label class="layui-form-label">文件</label>
                         <div class="layui-input-block">
-                            <span></span>
-                            <input type="text" style="display:none" name="file" value="" />
-                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="file">
-                                <i class="layui-icon layui-icon-upload"></i>上传文件
-                            </button>
-                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-file">
-                                <i class="layui-icon layui-icon-align-left"></i>选择文件
-                            </button>
+                            <input type="file" name="__file__" >
                         </div>
                     </div>
 
@@ -86,36 +78,6 @@
             })
 
 
-            layui.use(["upload", "layer", "popup", "util"], function() {
-                let input = layui.$("#file").prev();
-                input.prev().html(layui.util.escape(input.val()));
-                layui.$("#attachment-choose-file").on("click", function() {
-                    parent.layer.open({
-                        type: 2,
-                        title: "选择附件",
-                        content: "/app/admin/upload/attachment",
-                        area: ["95%", "90%"],
-                        success: function (layero, index) {
-                            parent.layui.$("#layui-layer" + index).data("callback", function (data) {
-                                input.val(data.url).prev().html(layui.util.escape(data.url));
-                            });
-                        }
-                    });
-                });
-                layui.upload.render({
-                    elem: "#file",
-                    value: "",
-                    accept: "file",
-                    url: "/app/admin/upload/file",
-                    field: "__file__",
-                    done: function (res) {
-                        if (res.code) return layui.popup.failure(res.msg);
-                        this.item.prev().val(res.data.url).prev().html(layui.util.escape(res.data.url));
-                    }
-                });
-            });
-            
-
             //提交事件
             layui.use(["form", "popup"], function () {
                 // 字段验证允许为空
@@ -128,19 +90,54 @@
                     identity: [/(^$)|(^\d{15}$)|(^\d{17}(x|X|\d)$)/, "请输入正确的身份证号"]
                 });
                 layui.form.on("submit(save)", function (data) {
+                    const formData = new FormData();
+                    const field = data.field; // 表单字段
+                    const fileInput = document.querySelector("input[name='__file__']"); // 获取文件输入框
+                    // 添加文件字段
+                    if (fileInput && fileInput.files.length > 0) {
+                        formData.append("file", fileInput.files[0]);
+                    }
+                    // 添加其他表单字段
+                    for (let key in field) {
+                        if (field.hasOwnProperty(key)) {
+                            formData.append(key, field[key]);
+                        }
+                    }
                     layui.$.ajax({
                         url: INSERT_API,
                         type: "POST",
-                        dateType: "json",
-                        data: data.field,
+                        data: formData,
+                        dataType: "json",
+                        contentType: false, // 必须设为 false，让浏览器自动识别 Content-Type
+                        processData: false, // 防止 jQuery 自动转换数据
                         success: function (res) {
                             if (res.code) {
                                 return layui.popup.failure(res.msg);
                             }
-                            return layui.popup.success("操作成功", function () {
-                                parent.refreshTable();
-                                parent.layer.close(parent.layer.getFrameIndex(window.name));
-                            });
+                                parent.layer.confirm(res.msg, {
+                                    btn: ['确定', '关闭'], //按钮
+                                    title: '确认提示' // 设置弹出框标题
+                                }, function(){
+                                    formData.append('confirm', 'yes');
+                                    layui.$.ajax({
+                                        url: INSERT_API,
+                                        type: "POST",
+                                        data: formData,
+                                        dataType: "json",
+                                        contentType: false, // 必须设为 false，让浏览器自动识别 Content-Type
+                                        processData: false, // 防止 jQuery 自动转换数据
+                                        success: function (res) {
+                                            if (res.code) {
+                                                return parent.layui.popup.failure(res.msg);
+                                            }
+                                            return parent.layui.popup.success('导入成功', function () {
+                                                parent.refreshTable();
+                                                parent.layer.close(parent.layer.getFrameIndex(window.name));
+                                            });
+                                        }
+                                    })
+                                });
+
                         }
                     });
                     return false;

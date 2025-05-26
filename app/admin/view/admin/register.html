@@ -33,7 +33,7 @@
 
     <!-- 新增短信验证码输入框 -->
     <div class="layui-form-item">
-        <input hover  lay-verify="required" class="code layui-input layui-input-inline" name="mobilecaptcha" placeholder="短信验证码" />
+        <input hover  lay-verify="required" class="code layui-input layui-input-inline" name="captcha" placeholder="短信验证码" />
         <div type="button" class="codeImage layui-btn" id="sendCaptcha">发送验证码</div>
     </div>
 
@@ -76,18 +76,17 @@
         form.on('submit(register)', function (data) {
             layer.load();
             $.ajax({
-                url: '/app/admin/account/register',
+                url: '/admin/admin/register',
                 type: "POST",
                 data: data.field,
                 success: function (res) {
                     layer.closeAll('loading');
                     if (!res.code) {
                         layui.popup.success('注册成功', function () {
-                            location.reload();
+                            location.href = '/app/admin';
                         })
                     } else {
                         layui.popup.failure(res.msg)
-
                     }
                 }
             });
