@@ -4,21 +4,17 @@ namespace app\admin\controller;
 
 use app\admin\exception\ImportExceprion;
 use app\admin\model\Admin;
+use app\admin\model\Orders;
+use app\api\service\Pay;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
-use Ramsey\Uuid\Uuid;
-use SplFileInfo;
+use plugin\admin\app\controller\Crud;
 use support\Db;
+use support\exception\BusinessException;
 use support\Request;
 use support\Response;
-use app\admin\model\Orders;
-use plugin\admin\app\controller\Crud;
-use support\exception\BusinessException;
-use Yansongda\Pay\Pay;
 
 /**
  * 口令管理
@@ -128,6 +124,16 @@ class OrdersController extends Crud
             if ($status == 3 && $row->status != 0) {
                 return $this->fail('状态已变更,请刷新');
             }
+            if ($status == 3 && $row->status == 0) {
+                //退款
+                $total_refund_amount = bcadd($row->amount, $row->service_amount, 2);
+                $refund_ordersn = Pay::generateOrderSn();
+                Admin::changeMoney($total_refund_amount, $row->admin_id, '订单退款:' . $refund_ordersn, 4);
+                $request->setParams('post',[
+                    'refund_ordersn' => $refund_ordersn,
+                    'refund_time' => Carbon::now(),
+                ]);
+            }
             return parent::update($request);
         }
         return view('orders/update');
@@ -202,9 +208,11 @@ class OrdersController extends Crud
                 $data = [];
                 $total_amount = 0;
                 $rows = 0;
+                $total_service_amount = '0';
                 foreach ($insert as $key => $item) {
                     $ordersn = $item['ordersn'];
                     $amount = $item['amount'];
+                    $service_amount = $amount <= 10 ? '0.09' : bcmul($amount, '0.009', 2);
                     if ($this->model->where('ordersn', $ordersn)->exists()) {
                         unset($insert[$key]);
                         continue;
@@ -213,21 +221,29 @@ class OrdersController extends Crud
                         unset($insert[$key]);
                         continue;
                     }
+
+
                     $data[] = [
                         'admin_id' => $admin_id,
                         'ordersn' => $ordersn,
                         'amount' => $amount,
                         'start_time' => $start_time,
                         'end_time' => $end_time,
+                        'service_amount' => $service_amount,
                     ];
+
                     $total_amount += $amount;
                     $rows++;
+                    $total_service_amount = bcadd($total_service_amount, $service_amount, 2);
+
                 }
+                $use_amount = bcadd($total_amount, $total_service_amount, 2);
+                $msg = '总计导入' . $rows . '条订单,总金额' . $total_amount . '元,' . '服务费' . $total_service_amount . '元,' . '扣款金额' . $use_amount . '元';
                 if ($confirm == 'no') {
-                    throw new ImportExceprion('总计导入' . $rows . '行数据,总金额' . $total_amount . '元');
+                    throw new ImportExceprion($msg);
                 }
 
-                if ($total_amount > $admin->money) {
+                if ($use_amount > $admin->money) {
                     throw new \Exception('余额不足');
                 }
 
@@ -235,10 +251,10 @@ class OrdersController extends Crud
                     Orders::create($item);
                 }
                 #减少商家余额
-                Admin::changeMoney(-$total_amount, $admin_id, '导入订单', 1);
+                Admin::changeMoney(-$use_amount, $admin_id, $msg, 1);
 
                 DB::connection('plugin.admin.mysql')->commit();
-            } catch (ImportExceprion $e){
+            } catch (ImportExceprion $e) {
                 DB::connection('plugin.admin.mysql')->rollBack();
                 return $this->success($e->getMessage());
             } catch (\Throwable $exception) {
@@ -253,7 +269,52 @@ class OrdersController extends Crud
             return $this->success('导入成功');
         }
         return view('orders/import');
+    }
 
+    /**
+     * 删除
+     * @param Request $request
+     * @return Response
+     * @throws BusinessException
+     */
+    public function delete(Request $request): Response
+    {
+        $ids = $this->deleteInput($request);
+        $this->doDelete($ids);
+        return $this->json(0);
+    }
+
+    /**
+     * 退款
+     * @param Request $request
+     * @return Response
+     */
+    public function refund(Request $request): Response
+    {
+        $ids = $this->deleteInput($request);
+        $refund_time = Carbon::now();
+        $refund_ordersn = Pay::generateOrderSn();
+        $total_amount = '0';
+        $total_service_amount = '0';
+        $admin_id = admin_id();
+        DB::connection('plugin.admin.mysql')->beginTransaction();
+        try {
+            $this->model->whereIn('id', $ids)->where('status', 0)->each(function (Orders $item) use ($refund_time, $refund_ordersn, &$total_amount, &$total_service_amount) {
+                $item->refund_time = $refund_time;
+                $item->refund_ordersn = $refund_ordersn;
+                $item->status = 3;
+                $item->save();
+                $total_amount = bcadd($total_amount, $item->amount, 2);
+                $total_service_amount = bcadd($total_service_amount, $item->service_amount, 2);
+            });
+            $total_refund_amount = bcadd($total_amount, $total_service_amount, 2);
+            Admin::changeMoney($total_refund_amount, $admin_id, '订单批量退款:' . $refund_ordersn, 4);
+            DB::connection('plugin.admin.mysql')->commit();
+        } catch (\Throwable $e) {
+            DB::connection('plugin.admin.mysql')->rollBack();
+            return $this->fail($e->getMessage());
+        }
+        return $this->json(0);
     }
 
 

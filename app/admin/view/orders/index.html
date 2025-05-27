@@ -81,6 +81,10 @@
             </button>
 
             <span style="color:red;" class="layui-icon layui-icon-tips">请勿修改模板中第一行内容</span>
+
+            <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRefund" permission="admin.orders.refund">
+                <i class="layui-icon layui-icon-rmb"></i>批量退款
+            </button>
         </script>
 
         <!-- 表格行工具栏 -->
@@ -101,6 +105,7 @@
             const SELECT_API = "/admin/orders/select";
             const UPDATE_API = "/admin/orders/update";
             const DELETE_API = "/admin/orders/delete";
+            const REFUND_API = "/admin/orders/refund";
             const INSERT_URL = "/admin/orders/insert";
             const IMPORT_URL = "/admin/orders/import";
             const UPDATE_URL = "/admin/orders/update";
@@ -158,6 +163,10 @@
 						field: "ordersn",
                         width: 180,
 					},{
+                        title: "退款单号",align: "center",
+                        field: "refund_ordersn",
+                        width: 180,
+                    },{
 						title: "金额",align: "center",
 						field: "amount",
 					},{
@@ -243,6 +252,8 @@
                         handleImport();
                     } else if (obj.event === "download") {
                         window.location.href = "/导入模板.xls";
+                    } else if (obj.event === "batchRefund") {
+                        batchRefund();
                     }
                 });
 
@@ -337,6 +348,15 @@
                     doRemove(checkIds.split(","));
                 }
 
+                let batchRefund = function(obj) {
+                    let checkIds = common.checkField(obj, PRIMARY_KEY);
+                    if (checkIds === "") {
+                        layui.popup.warning("未选中数据");
+                        return false;
+                    }
+                    doRefund(checkIds.split(","));
+                }
+
                 // 执行删除
                 let doRemove = function (ids) {
                     let data = {};
@@ -349,6 +369,31 @@
                         let loading = layer.load();
                         $.ajax({
                             url: DELETE_API,
+                            data: data,
+                            dataType: "json",
+                            type: "post",
+                            success: function(res) {
+                                layer.close(loading);
+                                if (res.code) {
+                                    return layui.popup.failure(res.msg);
+                                }
+                                return layui.popup.success("操作成功", refreshTable);
+                            }
+                        })
+                    });
+                }
+
+                let doRefund = function (ids) {
+                    let data = {};
+                    data[PRIMARY_KEY] = ids;
+                    layer.confirm("确定退款?", {
+                        icon: 3,
+                        title: "提示"
+                    }, function(index) {
+                        layer.close(index);
+                        let loading = layer.load();
+                        $.ajax({
+                            url: REFUND_API,
                             data: data,
                             dataType: "json",
                             type: "post",

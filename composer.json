@@ -46,7 +46,8 @@
     "w7corp/easywechat": "^6.17",
     "overtrue/easy-sms": "^3.1",
     "aliyuncs/oss-sdk-php": "^2.7",
-    "webman/rate-limiter": "^1.1"
+    "webman/rate-limiter": "^1.1",
+    "ext-bcmath": "*"
   },
   "suggest": {
     "ext-event": "For better performance. "

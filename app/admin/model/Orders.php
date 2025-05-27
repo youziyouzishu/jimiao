@@ -14,6 +14,7 @@ use plugin\admin\app\model\Base;
  * @property int $admin_id 商户
  * @property string $ordersn 订单号
  * @property string $amount 金额
+ * @property string $service_amount 服务费
  * @property int $status 状态:0=待领取,1=已领取,2=已过期
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
@@ -30,6 +31,8 @@ use plugin\admin\app\model\Base;
  * @property \Illuminate\Support\Carbon $start_time 开始时间
  * @property \Illuminate\Support\Carbon $end_time 结束时间
  * @property \Illuminate\Support\Carbon|null $receive_time 领取时间
+ * @property string|null $refund_ordersn 退款单号
+ * @property \Illuminate\Support\Carbon|null $refund_time 退款时间
  * @mixin \Eloquent
  */
 class Orders extends Base
@@ -53,6 +56,7 @@ class Orders extends Base
         'start_time' => 'datetime',
         'end_time' => 'datetime',
         'receive_time' => 'datetime',
+        'refund_time' => 'datetime',
     ];
 
     protected $fillable = [
@@ -64,6 +68,8 @@ class Orders extends Base
         'status',
         'user_id',
         'receive_time',
+        'service_amount',
+        'refund_time'
     ];
 
 

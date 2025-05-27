@@ -32,6 +32,7 @@ use support\Db;
  * @property int $role 角色
  * @property int $status 禁用
  * @property string|null $openid 服务号OPENID
+ * @property string|null $unionid 开放平台唯一ID
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
@@ -78,6 +79,7 @@ class User extends Base
         'role',
         'status',
         'openid',
+        'unionid'
     ];
 
     /**

@@ -33,7 +33,8 @@ class AccountController extends Base
         $raw = $ret->getRaw();
         $nickname = $raw['nickname'];
         $avatar = $raw['headimgurl'];
-        $user = User::where('openid', $openid)->first();
+        $unionid = $raw['unionid'];
+        $user = User::where('unionid', $unionid)->first();
         if (!$user){
             $user = User::create([
                 'nickname' => !empty($nickname) ? $nickname : '用户' . mt_rand(1000, 9999),
@@ -43,6 +44,7 @@ class AccountController extends Base
                 'last_time' => Carbon::now()->toDateTimeString(),
                 'last_ip' => $request->getRealIp(),
                 'openid' => $openid,
+                'unionid' => $unionid
             ]);
         }else{
             if ($user->status == 1){
@@ -50,6 +52,7 @@ class AccountController extends Base
             }
             $user->last_time = Carbon::now()->toDateTimeString();
             $user->last_ip = $request->getRealIp();
+            $user->unionid = $unionid;
             $user->save();
         }
         $token = JwtToken::generateToken([
