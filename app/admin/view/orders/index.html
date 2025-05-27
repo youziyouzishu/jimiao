@@ -15,13 +15,6 @@
                 <form class="layui-form top-search-from">
                     
                     <div class="layui-form-item">
-                        <label class="layui-form-label">主键</label>
-                        <div class="layui-input-block">
-                            <input type="number" name="id" value="" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
                         <label class="layui-form-label">状态</label>
                         <div class="layui-input-block">
                             <div name="status" id="status" value="" ></div>
@@ -80,11 +73,13 @@
                 <i class="layui-icon layui-icon-delete"></i>删除
             </button>
 
-            <span style="color:red;" class="layui-icon layui-icon-tips">请勿修改模板中第一行内容</span>
-
             <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRefund" permission="admin.orders.refund">
                 <i class="layui-icon layui-icon-rmb"></i>批量退款
             </button>
+
+            <span style="color:red;" class="layui-icon layui-icon-tips">请勿修改模板中第一行内容</span>
+
+
         </script>
 
         <!-- 表格行工具栏 -->
@@ -99,6 +94,19 @@
         <script src="/app/admin/admin/js/common.js"></script>
         
         <script>
+
+            function copyText(text) {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        layui.use('layer', function () {
+                            const layer = layui.layer;
+                            layer.msg('复制成功',{ time: 1000 });
+                        });
+                    })
+                    .catch(err => {
+                        console.error('复制失败:', err);
+                    });
+            }
 
             // 相关常量
             const PRIMARY_KEY = "id";
@@ -162,11 +170,10 @@
 						title: "订单号",align: "center",
 						field: "ordersn",
                         width: 180,
+                        templet: function(d) {
+                            return '<a href="javascript:void(0);" onclick="copyText(\'' + d.ordersn + '\')">' + d.ordersn + '</a>';
+                        }
 					},{
-                        title: "退款单号",align: "center",
-                        field: "refund_ordersn",
-                        width: 180,
-                    },{
 						title: "金额",align: "center",
 						field: "amount",
 					},{
@@ -176,6 +183,10 @@
 						title: "结束时间",align: "center",
 						field: "end_time",
 					},{
+                        title: "退款单号",align: "center",
+                        field: "refund_ordersn",
+                        width: 180,
+                    },{
 						title: "状态",align: "center",
 						field: "status",
 						templet: function (d) {
@@ -253,7 +264,7 @@
                     } else if (obj.event === "download") {
                         window.location.href = "/导入模板.xls";
                     } else if (obj.event === "batchRefund") {
-                        batchRefund();
+                        batchRefund(obj);
                     }
                 });
 
@@ -349,7 +360,9 @@
                 }
 
                 let batchRefund = function(obj) {
+                    console.log(obj);
                     let checkIds = common.checkField(obj, PRIMARY_KEY);
+                    console.log(checkIds);
                     if (checkIds === "") {
                         layui.popup.warning("未选中数据");
                         return false;
