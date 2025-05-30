@@ -10,7 +10,6 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 	};
 
 	pearMenu.prototype.render = function (opt) {
-
 		var option = {
 			elem: opt.elem,
 			async: opt.async,
@@ -138,6 +137,15 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 		}
 		return d;
 	}
+
+	pearMenu.prototype.updateBadge = function(menuId, count) {
+		var badgeElem = $("#" + this.option.elem).find("a[menu-id='" + menuId + "'] .layui-badge");
+		if (count > 0) {
+			badgeElem.text(count).show();
+		} else {
+			badgeElem.hide();
+		}
+	};
 
 	pearMenu.prototype.skin = function (skin) {
 		var menu = $(".pear-nav-tree[lay-filter='" + this.option.elem + "']").parent();
@@ -307,7 +315,8 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 				content += '<a class="' + className + '" menu-type="' + item.type + '" menu-url="' + item.href + '" menu-id="' +
 					item.id +
 					'" menu-title="' + item.title + '"  href="' + href + '"  ' + target + '><i class="' + item.icon +
-					'"></i><span>' + item.title + '</span></a>';
+					'"></i><span>' + item.title + '</span> '+
+					'<span class="layui-badge" id="badge-' + item.id + '" style="margin-left:5px;display:' + (item.badge ? 'inline-block' : 'none') + '">' + (item.badge || '') + '</span></a>';
 			}
 			// 调 用 递 归 方 法 加 载 无 限 层 级 的 子 菜 单 
 			content += loadchild(item);

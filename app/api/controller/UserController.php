@@ -73,7 +73,7 @@ class UserController extends Base
         }
         $total_amount = $order->amount + $order->service_amount;
         if ($order->admin->money < $total_amount){
-            return $this->fail('商家余额不足');
+            return $this->fail('商家余额不足，请联系商户处理');
         }
 
         #进行领取

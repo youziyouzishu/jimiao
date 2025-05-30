@@ -24,7 +24,7 @@ Route::fallback(function () {
     }
 });
 
-Route::any('/h5/', function (Request $request) {
+Route::any('/h5[{path:.+}]', function (Request $request) {
     $dirPath = public_path() . '/h5/';
 
     // 获取目录下所有以 index. 开头的文件

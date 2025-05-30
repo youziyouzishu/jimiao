@@ -4,6 +4,7 @@ namespace app\admin\controller;
 
 use app\admin\exception\ImportExceprion;
 use app\admin\model\Admin;
+use app\admin\model\AdminRealinfo;
 use app\admin\model\Orders;
 use app\api\service\Pay;
 use Carbon\Carbon;
@@ -129,16 +130,6 @@ class OrdersController extends Crud
             if ($status == 3 && $row->status != 0) {
                 return $this->fail('状态已变更,请刷新');
             }
-            if ($status == 3 && $row->status == 0) {
-                //退款
-                $total_refund_amount = bcadd($row->amount, $row->service_amount, 2);
-                $refund_ordersn = Pay::generateOrderSn();
-                Admin::changeMoney($total_refund_amount, $row->admin_id, '订单退款:' . $refund_ordersn, 4);
-                $request->setParams('post', [
-                    'refund_ordersn' => $refund_ordersn,
-                    'refund_time' => Carbon::now(),
-                ]);
-            }
             return parent::update($request);
         }
         return view('orders/update');
@@ -155,6 +146,10 @@ class OrdersController extends Crud
     {
 
         if ($request->method() === 'POST') {
+            $realinfo = AdminRealinfo::where('admin_id', admin_id())->where('status', 1)->first();
+            if (empty($realinfo)) {
+                return $this->fail('请先完善实名认证信息');
+            }
             $start_time = $request->post('start_time');
             $end_time = $request->post('end_time');
             $confirm = $request->post('confirm', 'no');
@@ -176,7 +171,7 @@ class OrdersController extends Crud
             if (!in_array($ext, ['xls', 'xlsx'])) {
                 return $this->fail('文件格式错误');
             }
-            $admin_id = admin_id();
+
             if ($ext === 'xls') {
                 $reader = new Xls();
             } else {
@@ -185,7 +180,6 @@ class OrdersController extends Crud
             if (!$PHPExcel = $reader->load($file->getRealPath())) {
                 return $this->fail('文件格式错误');
             }
-
             if ($confirm == 'yes'){
                 try {
                     #限流器 每个用户1秒内只能请求1次
@@ -194,10 +188,7 @@ class OrdersController extends Crud
                     return $this->fail('请求频繁');
                 }
             }
-
-            $admin = Admin::find($admin_id);
-
-
+            $admin_id = admin_id();
             DB::connection('plugin.admin.mysql')->beginTransaction();
             try {
                 // 读取文件中的第一个工作表
@@ -317,30 +308,20 @@ class OrdersController extends Crud
     }
 
     /**
-     * 退款
+     * 批量作废
      * @param Request $request
      * @return Response
      */
     public function refund(Request $request): Response
     {
         $ids = $this->deleteInput($request);
-        $refund_time = Carbon::now();
-        $refund_ordersn = Pay::generateOrderSn();
-        $total_amount = '0';
-        $total_service_amount = '0';
-        $admin_id = admin_id();
         DB::connection('plugin.admin.mysql')->beginTransaction();
         try {
-            $this->model->whereIn('id', $ids)->where('status', 0)->each(function (Orders $item) use ($refund_time, $refund_ordersn, &$total_amount, &$total_service_amount) {
-                $item->refund_time = $refund_time;
-                $item->refund_ordersn = $refund_ordersn;
+            $this->model->whereIn('id', $ids)->where('status', 0)->each(function (Orders $item) {
                 $item->status = 3;
                 $item->save();
-                $total_amount = bcadd($total_amount, $item->amount, 2);
-                $total_service_amount = bcadd($total_service_amount, $item->service_amount, 2);
             });
-            $total_refund_amount = bcadd($total_amount, $total_service_amount, 2);
-            Admin::changeMoney($total_refund_amount, $admin_id, '订单批量退款:' . $refund_ordersn, 4);
+
             DB::connection('plugin.admin.mysql')->commit();
         } catch (\Throwable $e) {
             DB::connection('plugin.admin.mysql')->rollBack();

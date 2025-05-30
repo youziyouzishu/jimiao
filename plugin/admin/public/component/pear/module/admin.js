@@ -1,4 +1,4 @@
-layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'menu', 'frame', 'theme', 'convert','fullscreen'],
+layui.define(['message', 'table','notice', 'jquery', 'element', 'yaml', 'form', 'tab', 'menu', 'frame', 'theme', 'convert','fullscreen'],
 	function(exports) {
 		"use strict";
 
@@ -12,7 +12,8 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 			pearFrame = layui.frame,
 			pearTheme = layui.theme,
 			message = layui.message,
-			fullscreen=layui.fullscreen;
+			fullscreen=layui.fullscreen,
+			notice=layui.notice;
 
 		var bodyFrame;
 		var sideMenu;
@@ -94,12 +95,73 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						compatible();
 					},
 					done: function() {
+						$.ajax({
+							url: '/app/admin/rule/updateBadge',
+							type: 'get',
+							dataType: 'json',
+							async: false,
+							success: function(result) {
+								sideMenu.updateBadge(114, result.data.realinfo);
+								sideMenu.updateBadge(119, result.data.rechargeinfo);
+							}
+						})
+
 						sideMenu.isCollapse = param.menu.collapse;
 						sideMenu.selectItem(param.menu.select);
+
 						pearAdmin.collapse(param);
 					}
 				});
+
+				setInterval(function () {
+					$.ajax({
+						url: '/app/admin/rule/updateBadge',
+						type: 'get',
+						dataType: 'json',
+						async: false,
+						success: function(result) {
+							let realinfo = result.data.realinfo;
+							let rechargeinfo = result.data.rechargeinfo;
+							sideMenu.updateBadge(114, realinfo);
+							sideMenu.updateBadge(119, rechargeinfo);
+							if (realinfo > 0){
+								notice.info("实名申请待审核",'',{
+									timeOut: 1500,
+									closeButton: true,
+									progressBar: true,
+									preventDuplicates:true,
+									hideDuration:300,
+									showMethod:"slideDown",
+									hideMethod:"slideUp",
+									positionClass: "toast-top-center",
+									onclick: function() {
+										pearAdmin.jump(114, '商户实名管理', '/admin/admin-realinfo/index');
+									}
+
+								})
+							}
+							if (rechargeinfo > 0){
+								notice.info("充值申请待审核",'',{
+									timeOut: 1500,
+									closeButton: true,
+									progressBar: true,
+									preventDuplicates:true,
+									hideDuration:300,
+									showMethod:"slideDown",
+									hideMethod:"slideUp",
+									positionClass: "toast-top-center",
+									onclick: function() {
+										pearAdmin.jump(119, '商户充值管理', '/admin/admin-recharge/index');
+									}
+								})
+							}
+
+						}
+					})
+
+				}, 5000);
 			}
+
 
 			this.bodyRender = function(param) {
 

@@ -20,35 +20,22 @@
                             <input type="number" name="amount" min="1" step="1" value="" required lay-verify="required" class="layui-input">
                         </div>
                     </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">银行卡号</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="bankcard_no" value="<?= htmlspecialchars($recharge_info_last['bankcard_no'] ?? '') ?>" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
-                    
+
                     <div class="layui-form-item">
                         <label class="layui-form-label required">持卡人姓名</label>
                         <div class="layui-input-block">
-                            <input type="text" name="truename" value="<?= htmlspecialchars($recharge_info_last['truename'] ?? '') ?>" required lay-verify="required" class="layui-input">
+                            <input type="text" readonly value="<?= htmlspecialchars($realinfo['truename'] ?? '') ?>" class="layui-input">
                         </div>
                     </div>
-                    
+
                     <div class="layui-form-item">
-                        <label class="layui-form-label required">身份证号码</label>
                         <div class="layui-input-block">
-                            <input type="text" name="idcard_no" value="<?= htmlspecialchars($recharge_info_last['idcard_no'] ?? '') ?>" required lay-verify="required" class="layui-input">
+                            <span style="color: #fd0028; font-size: 16px;">
+                                <strong>温馨提示:</strong>充值银行卡必须为本商户实名卡号，不得他人代充，充值金额必须与转账金额一致，否则无法到账。
+                            </span>
                         </div>
                     </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label required">预留手机号</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="mobile" value="<?= htmlspecialchars($recharge_info_last['mobile'] ?? '') ?>" required lay-verify="required" class="layui-input">
-                        </div>
-                    </div>
-                    
+
                 </div>
             </div>
 
@@ -140,7 +127,7 @@
                                 parent.layer.open({
                                     type: 1,
                                     title: "银行卡信息",
-                                    area: ['30%', '45%'], // 宽高
+                                    area: ['35%', '55%'], // 宽高
                                     content: content,
                                     btn:  ['关闭'],
                                 });

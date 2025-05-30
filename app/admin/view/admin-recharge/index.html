@@ -13,11 +13,11 @@
         <div class="layui-card">
             <div class="layui-card-body">
                 <form class="layui-form top-search-from">
-                    
+
                     <div class="layui-form-item">
-                        <label class="layui-form-label">主键</label>
+                        <label class="layui-form-label">订单号</label>
                         <div class="layui-input-block">
-                            <input type="number" name="id" value="" class="layui-input">
+                            <input type="text" name="ordersn" value="" class="layui-input">
                         </div>
                     </div>
                     
@@ -58,11 +58,11 @@
 
         <!-- 表格顶部工具栏 -->
         <script type="text/html" id="table-toolbar">
-            <?php if ($show == true): ?>
+
             <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add" permission="admin.adminrecharge.insert">
                 <i class="layui-icon layui-icon-add-1"></i>充值
             </button>
-            <?php endif; ?>
+
             <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove" permission="admin.adminrecharge.delete">
                 <i class="layui-icon layui-icon-delete"></i>删除
             </button>
@@ -115,6 +115,7 @@
 						title: "主键",align: "center",
 						field: "id",
 						sort: true,
+                        hide:true
 					},{
 						title: "商户",align: "center",
 						field: "admin_id",
@@ -133,19 +134,7 @@
                     },{
                         title: "服务费",align: "center",
                         field: "service_amount",
-                    },{
-						title: "银行卡号",align: "center",
-						field: "bankcard_no",
-					},{
-						title: "持卡人姓名",align: "center",
-						field: "truename",
-					},{
-						title: "身份证号码",align: "center",
-						field: "idcard_no",
-					},{
-						title: "预留手机号",align: "center",
-						field: "mobile",
-					},
+                    },
                     {
 						title: "收款卡号",align: "center",
 						field: "recharge_bankcard_no",

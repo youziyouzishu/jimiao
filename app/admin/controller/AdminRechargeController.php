@@ -40,13 +40,7 @@ class AdminRechargeController extends Crud
      */
     public function index(): Response
     {
-        $roles = admin('roles');
-        if (in_array(3, $roles)) {
-            $show = true;
-        } else {
-            $show = false;
-        }
-        return view('admin-recharge/index', ['show' => $show]);
+        return view('admin-recharge/index');
     }
 
     /**
@@ -73,20 +67,13 @@ class AdminRechargeController extends Crud
      */
     public function insert(Request $request): Response
     {
+        $realinfo = AdminRealinfo::where('admin_id', admin_id())->where('status', 1)->first();
         if ($request->method() === 'POST') {
             $amount = $request->post('amount');
-            $bankcard_no = $request->post('bankcard_no');
-            $truename = $request->post('truename');
-            $idcard_no = $request->post('idcard_no');
-            $mobile = $request->post('mobile');
-            $realinfo = AdminRealinfo::where('admin_id', admin_id())->where('status', 1)->first();
             if (empty($realinfo)) {
                 return $this->fail('请先完善实名认证信息');
             }
-            if ($realinfo->truename != $truename) {
-                return $this->fail('请使用实名姓名');
-            }
-            if (empty($amount) || $amount <= 0) {
+            if (empty($amount) || !is_numeric($amount) || $amount <= 0) {
                 return $this->fail('充值金额必须大于0');
             }
             //充值金额必须是整数
@@ -116,12 +103,6 @@ class AdminRechargeController extends Crud
                 'amount' => $amount,
                 'title' => '商户充值',
                 'description' => '商户充值',
-                'bankVerification' => [
-                    'accountNo' => $bankcard_no,
-                    'name' => $truename,
-                    'idCardCode' => $idcard_no,
-                    'bankPreMobile' => $mobile
-                ],
                 'timestamp' => $timestamp
             ];
 
@@ -157,8 +138,8 @@ class AdminRechargeController extends Crud
             $id = $this->doInsert($data);
             return $this->json(0, 'ok', $params);
         }
-        $recharge_info_last = AdminRecharge::where('admin_id', admin_id())->orderBy('id', 'desc')->first();
-        return view('admin-recharge/insert',  ['recharge_info_last' => $recharge_info_last]);
+
+        return view('admin-recharge/insert',  ['realinfo' => $realinfo]);
     }
 
     /**

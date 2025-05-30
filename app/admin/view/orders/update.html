@@ -108,7 +108,7 @@
                             let initValue = value ? value.split(",") : [];
                             let data = [{"value":"0","name":"待领取"},{"value":"1","name":"已领取"},{"value":"2","name":"已过期"},{"value":"3","name":"已作废"}];
                             if (value === "0") {
-                                data = [{"value":"0","name":"待领取"},{"value":"3","name":"退款"}];
+                                data = [{"value":"0","name":"待领取"},{"value":"3","name":"作废"}];
                             }
                             if (value === "1") {
                                 data = [{"value":"1","name":"已领取"}];

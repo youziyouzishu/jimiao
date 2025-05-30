@@ -2,6 +2,8 @@
 
 namespace plugin\admin\app\controller;
 
+use app\admin\model\AdminRealinfo;
+use app\admin\model\AdminRecharge;
 use Exception;
 use plugin\admin\app\common\Tree;
 use plugin\admin\app\common\Util;
@@ -22,7 +24,7 @@ class RuleController extends Crud
      *
      * @var string[]
      */
-    protected $noNeedAuth = ['get', 'permission'];
+    protected $noNeedAuth = ['get', 'permission','updateBadge'];
 
     /**
      * @var Rule
@@ -59,6 +61,18 @@ class RuleController extends Crud
         return parent::select($request);
     }
 
+    function updateBadge()
+    {
+        if (in_array(3, admin('roles'))) {
+            $realinfo = 0;
+            $rechargeinfo = 0;
+        }else{
+            $realinfo = AdminRealinfo::where('status',0)->count();
+            $rechargeinfo = AdminRecharge::where('status',0)->count();
+        }
+        return $this->json(0, 'ok', ['realinfo'=>$realinfo, 'rechargeinfo'=>$rechargeinfo]);
+    }
+
     /**
      * 获取菜单
      * @param Request $request
@@ -71,7 +85,6 @@ class RuleController extends Crud
         $types = $request->get('type', '0,1');
         $types = is_string($types) ? explode(',', $types) : [0, 1];
         $items = Rule::orderBy('weight', 'desc')->get()->toArray();
-
         $formatted_items = [];
         foreach ($items as $item) {
             $item['pid'] = (int)$item['pid'];
