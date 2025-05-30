@@ -15,6 +15,8 @@ use support\Db;
 use support\exception\BusinessException;
 use support\Request;
 use support\Response;
+use Webman\RateLimiter\Limiter;
+use Webman\RateLimiter\RateLimitException;
 
 /**
  * 口令管理
@@ -46,6 +48,9 @@ class OrdersController extends Crud
     {
         [$where, $format, $limit, $field, $order] = $this->selectInput($request);
         $query = $this->doSelect($where, $field, $order)->with(['admin']);
+        if (in_array(3, admin('roles'))) {
+            $query->where('admin_id', admin_id());
+        }
         return $this->doFormat($query, $format, $limit);
     }
 
@@ -129,7 +134,7 @@ class OrdersController extends Crud
                 $total_refund_amount = bcadd($row->amount, $row->service_amount, 2);
                 $refund_ordersn = Pay::generateOrderSn();
                 Admin::changeMoney($total_refund_amount, $row->admin_id, '订单退款:' . $refund_ordersn, 4);
-                $request->setParams('post',[
+                $request->setParams('post', [
                     'refund_ordersn' => $refund_ordersn,
                     'refund_time' => Carbon::now(),
                 ]);
@@ -181,6 +186,15 @@ class OrdersController extends Crud
                 return $this->fail('文件格式错误');
             }
 
+            if ($confirm == 'yes'){
+                try {
+                    #限流器 每个用户1秒内只能请求1次
+                    Limiter::check('admin_' . admin_id(), 1, 5);
+                } catch (RateLimitException $e) {
+                    return $this->fail('请求频繁');
+                }
+            }
+
             $admin = Admin::find($admin_id);
 
 
@@ -212,16 +226,18 @@ class OrdersController extends Crud
                 foreach ($insert as $key => $item) {
                     $ordersn = $item['ordersn'];
                     $amount = $item['amount'];
-                    $service_amount = $amount <= 10 ? '0.09' : bcmul($amount, '0.009', 2);
-                    if ($this->model->where('ordersn', $ordersn)->exists()) {
+
+                    if (empty($ordersn) || $this->model->where('ordersn', $ordersn)->exists()) {
                         unset($insert[$key]);
                         continue;
                     }
-                    if ($amount <= 0 || empty($amount) || empty($ordersn)) {
+                    if (empty($amount) || !is_numeric($amount) || $amount <= 0) {
                         unset($insert[$key]);
                         continue;
                     }
 
+                    $service_amount = $amount <= 10 ? '0.09' : bcmul($amount, '0.009', 3);
+                    $service_amount = $this->formatDecimalWithCeil($service_amount);
 
                     $data[] = [
                         'admin_id' => $admin_id,
@@ -243,15 +259,10 @@ class OrdersController extends Crud
                     throw new ImportExceprion($msg);
                 }
 
-                if ($use_amount > $admin->money) {
-                    throw new \Exception('余额不足');
-                }
-
                 foreach ($data as $item) {
                     Orders::create($item);
                 }
-                #减少商家余额
-                Admin::changeMoney(-$use_amount, $admin_id, $msg, 1);
+
 
                 DB::connection('plugin.admin.mysql')->commit();
             } catch (ImportExceprion $e) {
@@ -269,6 +280,27 @@ class OrdersController extends Crud
             return $this->success('导入成功');
         }
         return view('orders/import');
+    }
+
+
+    private function formatDecimalWithCeil($numberStr)
+    {
+        // 将字符串转换为浮点数
+        $floatVal = (float)$numberStr;
+
+        // 分离整数和小数部分
+        $parts = explode('.', number_format($floatVal, 10, '.', '')); // 精确到10位避免精度问题
+        $decimalPart = isset($parts[1]) ? $parts[1] : '';
+
+        // 判断是否超过两位小数
+        if (strlen($decimalPart) >= 3) {
+            // 超过两位小数时，使用 ceil 并指定保留两位
+            $rounded = ceil($floatVal * 100) / 100;
+            return number_format($rounded, 2, '.', '');
+        } else {
+            // 否则直接保留两位小数
+            return number_format($floatVal, 2, '.', '');
+        }
     }
 
     /**

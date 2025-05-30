@@ -129,6 +129,7 @@
 					},{
 						title: "主键",align: "center",
 						field: "id",
+                        hide:true
 					},{
 						title: "商户",align: "center",
 						field: "admin_id",
@@ -172,6 +173,7 @@
 						align: "center",
 						fixed: "right",
 						width: 120,
+                        hide:true
 					}
 				];
 				
@@ -185,7 +187,7 @@
 				    size: "lg",
 				    toolbar: "#table-toolbar",
 				    autoSort: false,
-                    cellMinWidth:170,
+                    cellMinWidth:120,
 				    defaultToolbar: [{
 				        title: "刷新",
 				        layEvent: "refresh",
@@ -193,6 +195,15 @@
 				    }, "filter", "print", "exports"],
 				    done: function () {
 				        layer.photos({photos: 'div[lay-id="data-table"]', anim: 5});
+                        <?php if ($type == 'merchant'): ?>
+                        table.hideCol('data-table', [{
+                            field: 'before',
+                            hide: true
+                        }, {
+                            field: 'after',
+                            hide: true
+                        }]);
+                        <?php endif; ?>
 				    }
 				});
 				

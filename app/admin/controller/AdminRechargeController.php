@@ -11,6 +11,8 @@ use support\Response;
 use app\admin\model\AdminRecharge;
 use plugin\admin\app\controller\Crud;
 use support\exception\BusinessException;
+use Webman\RateLimiter\Limiter;
+use Webman\RateLimiter\RateLimitException;
 
 /**
  * 商户充值记录
@@ -92,6 +94,13 @@ class AdminRechargeController extends Crud
                 return $this->fail('充值金额必须为整数');
             }
 
+            try {
+                #限流器 每个用户1秒内只能请求1次
+                Limiter::check('admin_' . admin_id(), 1, 5);
+            } catch (RateLimitException $e) {
+                return $this->fail('请求频繁');
+            }
+
 
             $service_amount = bcmul($amount, '0.01', 2);
             $into_amount = bcsub($amount, $service_amount, 2);
@@ -165,8 +174,14 @@ class AdminRechargeController extends Crud
             $id = $request->post('id');
             $row = $this->model->find($id);
             if ($row->status == 0 && $status == 1) {
+                try {
+                    #限流器 每个用户1秒内只能请求1次
+                    Limiter::check('admin_' . admin_id(), 1, 5);
+                } catch (RateLimitException $e) {
+                    return $this->fail('请求频繁');
+                }
                 //审核通过  增加余额
-                Admin::changeMoney($row->into_amount, $row->admin_id, '充值', 2);
+                Admin::changeMoney($row->into_amount, $row->admin_id, '充值：'.$row->amount.'元', 2);
                 //如果此商户有上级  并且此商户是普通商户
                 if ($row->admin->parent) {
                     $award_amount = bcmul($row->amount, '0.005', 2);#贡献奖

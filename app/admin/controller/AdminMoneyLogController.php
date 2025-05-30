@@ -50,7 +50,12 @@ class AdminMoneyLogController extends Crud
      */
     public function index(): Response
     {
-        return view('admin-money-log/index');
+        if (in_array(3, admin('roles'))) {
+            $type = 'merchant';
+        }else{
+            $type = 'admin';
+        }
+        return view('admin-money-log/index',['type' => $type]);
     }
 
     /**

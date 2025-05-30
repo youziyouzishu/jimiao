@@ -13,11 +13,25 @@
         <div class="layui-card">
             <div class="layui-card-body">
                 <form class="layui-form top-search-from">
-                    
+
                     <div class="layui-form-item">
                         <label class="layui-form-label">状态</label>
                         <div class="layui-input-block">
                             <div name="status" id="status" value="" ></div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">订单号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="ordersn" value="" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">退款单号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="refund_ordersn" value="" class="layui-input">
                         </div>
                     </div>
                     
@@ -160,6 +174,7 @@
 						title: "主键",align: "center",
 						field: "id",
 						sort: true,
+                        hide:true
 					},{
 						title: "商户",align: "center",
 						field: "admin_id",
@@ -169,7 +184,6 @@
 					},{
 						title: "订单号",align: "center",
 						field: "ordersn",
-                        width: 180,
                         templet: function(d) {
                             return '<a href="javascript:void(0);" onclick="copyText(\'' + d.ordersn + '\')">' + d.ordersn + '</a>';
                         }
@@ -177,27 +191,26 @@
 						title: "金额",align: "center",
 						field: "amount",
 					},{
+                        title: "状态",align: "center",
+                        field: "status",
+                        templet: function (d) {
+                            let field = "status";
+                            if (typeof d[field] == "undefined") return "";
+                            let items = [];
+                            layui.each((d[field] + "").split(","), function (k , v) {
+                                items.push(apiResults[field][v] || v);
+                            });
+                            return util.escape(items.join(","));
+                        }
+                    },{
+                        title: "退款批次",align: "center",
+                        field: "refund_ordersn",
+                    },{
 						title: "开始时间",align: "center",
 						field: "start_time",
 					},{
 						title: "结束时间",align: "center",
 						field: "end_time",
-					},{
-                        title: "退款单号",align: "center",
-                        field: "refund_ordersn",
-                        width: 180,
-                    },{
-						title: "状态",align: "center",
-						field: "status",
-						templet: function (d) {
-							let field = "status";
-							if (typeof d[field] == "undefined") return "";
-							let items = [];
-							layui.each((d[field] + "").split(","), function (k , v) {
-								items.push(apiResults[field][v] || v);
-							});
-							return util.escape(items.join(","));
-						}
 					},{
 						title: "创建时间",align: "center",
 						field: "created_at",
@@ -227,8 +240,7 @@
 				    skin: "grid",
 				    size: "lg",
 				    toolbar: "#table-toolbar",
-                    cellMinWidth:170,
-
+                    cellMinWidth:100,
 				    autoSort: false,
 				    defaultToolbar: [{
 				        title: "刷新",
