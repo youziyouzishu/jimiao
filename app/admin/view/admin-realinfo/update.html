@@ -79,7 +79,7 @@
                     <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="save">
                         提交
                     </button>
-                    <button type="reset" class="pear-btn pear-btn-md">
+                    <button type="submit" class="pear-btn pear-btn-md" lay-submit="" lay-filter="changeStatus">
                         重置
                     </button>
                 </div>
@@ -201,7 +201,7 @@
                             let initValue = value ? value.split(",") : [];
                             let data = [{"value":"0","name":"待审核"},{"value":"1","name":"通过"},{"value":"2","name":"驳回"}];
                             if (value === '1'){
-                                data = [{"value":"1","name":"通过"}];
+                                data = [{"value":"1","name":"通过"},{"value":"2","name":"重置"},];
                             }
                             if (value === '2'){
                                 data = [{"value":"2","name":"驳回"}];
@@ -275,6 +275,14 @@
                     });
                     return false;
                 });
+
+                layui.form.on("submit(changeStatus)", function (data) {
+                    // 设置状态为 "0"
+                    layui.xmSelect.get("#status", true).setValue(["2"]); // 更新 xmSelect 显示
+
+                    return false; // 阻止表单默认提交行为
+                });
+
             });
 
         </script>

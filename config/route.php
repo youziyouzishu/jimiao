@@ -12,6 +12,7 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+use support\Request;
 use support\Response;
 use Webman\Route;
 
@@ -23,10 +24,21 @@ Route::fallback(function () {
     }
 });
 
-Route::any('/h5/', function () {
-    return new Response(200, [], file_get_contents(public_path() . '/h5/index.html'));
-});
+Route::any('/h5/', function (Request $request) {
+    $dirPath = public_path() . '/h5/';
 
+    // 获取目录下所有以 index. 开头的文件
+    $files = glob($dirPath . 'index*html');
+
+    if (!empty($files)) {
+        // 取第一个匹配的文件
+        $filePath = $files[0];
+        return new Response(200, [], file_get_contents($filePath));
+    }
+
+    // 如果没有找到匹配的文件，则返回 404
+    return new Response(404, [], file_get_contents(base_path('plugin' . DIRECTORY_SEPARATOR. 'admin' . DIRECTORY_SEPARATOR . 'public') . '/demos/error/404.html'));
+});
 
 
 

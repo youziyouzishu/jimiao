@@ -87,6 +87,10 @@ class AdminRechargeController extends Crud
             if (empty($amount) || $amount <= 0) {
                 return $this->fail('充值金额必须大于0');
             }
+            //充值金额必须是整数
+            if (!filter_var($amount, FILTER_VALIDATE_INT)) {
+                return $this->fail('充值金额必须为整数');
+            }
 
 
             $service_amount = bcmul($amount, '0.01', 2);

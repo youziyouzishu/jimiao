@@ -21,13 +21,12 @@ class Task
         new Crontab('0 */1 * * * *', function(){
             $orders = Orders::where('end_time', '<', Carbon::now())->where('status', 0)->get();
             foreach ($orders as $order){
-                $total_refund_amount = bcadd($order->amount, $order->service_amount, 2);
                 $refund_ordersn = Pay::generateOrderSn();
                 $order->status = 2;
                 $order->refund_ordersn = $refund_ordersn;
-                $order->refund_time = $total_refund_amount;
+                $order->refund_time = Carbon::now();
                 $order->save();
-                Admin::changeMoney($total_refund_amount,$order->admin_id,'订单失效:'.$refund_ordersn,4);
+                Admin::changeMoney($order->amount,$order->admin_id,'订单失效:'.$refund_ordersn,4);
             }
         });
 
